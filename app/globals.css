@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #1d1d1d;
+  --color-charcoal: #121212;
+  --color-paper: #ffffff;
+  --color-crimson: #c82924;
+  --color-gold: #dfaf49;
+  --color-verdant: #6dd993;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-techno: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "General Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-marquee: marquee 22s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+:root {
+  --ink: #1d1d1d;
+  --charcoal: #121212;
+  --paper: #ffffff;
+  --crimson: #c82924;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+}
+
+html {
+  background: var(--ink);
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--crimson);
+  color: var(--paper);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+.cursor-only {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cursor-only {
+    display: block;
+  }
+}
+
+/* ---------- Lenis ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Typography helpers ---------- */
+.heading-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.text-techno {
+  font-family: var(--font-techno);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+}
+
+.text-body-light {
+  font-family: var(--font-body);
+  font-weight: 300;
+  letter-spacing: 0.005em;
+  line-height: 1.5;
+}
+
+/* ---------- Link underline (FooterUI style) ---------- */
+.underline-link {
+  position: relative;
+  display: inline-block;
+}
+.underline-link::after {
+  content: "";
+  transform-origin: 0 100%;
+  background: currentColor;
+  width: 100%;
+  height: 1px;
+  transition: transform 0.3s 0.1s;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(1);
+}
+.underline-link::before {
+  content: "";
+  transform-origin: 100% 100%;
+  background: currentColor;
+  width: 100%;
+  height: 1px;
+  transition: transform 0.3s;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+}
+@media (hover: hover) and (pointer: fine) {
+  .underline-link:hover::after {
+    transform-origin: 100% 100%;
+    transition-delay: 0s;
+    transform: scaleX(0);
+  }
+  .underline-link:hover::before {
+    transform-origin: 0 100%;
+    transition-delay: 0.1s;
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Scrollbar (subtle) ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--charcoal);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+}
