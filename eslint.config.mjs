@@ -23,6 +23,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Archived mirror of the reference site (vendored minified bundle, fonts, assets).
+    "assets/**",
   ]),
 ]);
 

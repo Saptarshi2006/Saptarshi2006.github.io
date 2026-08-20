@@ -8,9 +8,9 @@
   --color-gold: #dfaf49;
   --color-verdant: #6dd993;
 
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-techno: "Clash Display", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-charles-rosie), ui-serif, Georgia, serif;
+  --font-techno: var(--font-nikkei-ultra), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-gt-era), ui-sans-serif, system-ui, sans-serif;
 
   --animate-marquee: marquee 22s linear infinite;
 
@@ -96,14 +96,14 @@ html.lenis body {
 .text-techno {
   font-family: var(--font-techno);
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.005em;
   line-height: 1.2;
 }
 
 .text-body-light {
   font-family: var(--font-body);
-  font-weight: 300;
+  font-weight: 200;
   letter-spacing: 0.005em;
   line-height: 1.5;
 }
