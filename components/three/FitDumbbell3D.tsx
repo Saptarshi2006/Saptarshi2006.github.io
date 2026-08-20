@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Particles from "@/components/fx/Particles";
+import StudioEnv from "@/components/fx/StudioEnv";
 
 function Plate({ x, radius, color }: { x: number; radius: number; color: string }) {
   return (
@@ -29,6 +30,7 @@ export default function FitDumbbell3D() {
 
   return (
     <group>
+      <StudioEnv />
       <group ref={group} rotation={[0.15, 0.4, 0]}>
         <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
           <cylinderGeometry args={[0.09, 0.09, 2.9, 24]} />

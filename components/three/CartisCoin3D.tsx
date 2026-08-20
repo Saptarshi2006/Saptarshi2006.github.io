@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Particles from "@/components/fx/Particles";
+import StudioEnv from "@/components/fx/StudioEnv";
 
 function makeCoinTexture(): THREE.Texture {
   const canvas = document.createElement("canvas");
@@ -47,6 +48,7 @@ export default function CartisCoin3D() {
 
   return (
     <group>
+      <StudioEnv />
       <group ref={group}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[1.15, 1.15, 0.16, 64]} />

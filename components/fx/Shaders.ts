@@ -11,6 +11,8 @@ export const noiseFragment = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
   uniform float uOpacity;
+  uniform sampler2D uTex;
+  uniform float uTexStrength;
   varying vec2 vUv;
 
   float hash(vec2 p) {
@@ -43,6 +45,8 @@ export const noiseFragment = /* glsl */ `
   void main() {
     vec2 p = vUv * 2.5;
     float n = fbm(p + uTime * 0.03);
+    float grain = texture2D(uTex, vUv * 2.0).r;
+    n = mix(n, grain, uTexStrength * 0.5);
     n = smoothstep(0.3, 0.78, n);
     vec3 col = mix(uColorA, uColorB, n);
     float vig = smoothstep(1.4, 0.4, length(vUv - 0.5) * 1.6);
@@ -89,6 +93,8 @@ export const moonFragment = /* glsl */ `
   uniform float uTime;
   uniform vec3 uColorA;
   uniform vec3 uColorB;
+  uniform sampler2D uClouds;
+  uniform float uCloudStrength;
   varying vec2 vUv;
   varying vec3 vNormal;
   varying vec3 vPos;
@@ -122,7 +128,9 @@ export const moonFragment = /* glsl */ `
     vec3 lightDir = normalize(vec3(0.6, 0.8, 0.4));
     float diff = max(dot(n, lightDir), 0.0);
     float craters = fbm(vPos.xy * 1.6 + uTime * 0.01);
-    vec3 base = mix(uColorA, uColorB, craters);
+    float clouds = texture2D(uClouds, vUv * 3.0).r;
+    float shade = mix(craters, clouds, uCloudStrength);
+    vec3 base = mix(uColorA, uColorB, shade);
     float rim = pow(1.0 - max(dot(n, normalize(vec3(0.0, 0.0, 1.0))), 0.0), 2.0);
     vec3 col = base * (0.35 + 0.65 * diff);
     col += vec3(0.08) * rim;

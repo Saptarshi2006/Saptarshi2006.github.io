@@ -1,16 +1,18 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import Backdrop from "@/components/fx/Backdrop";
 import Particles from "@/components/fx/Particles";
 import GazeCamera from "@/components/fx/GazeCamera";
+import StudioEnv from "@/components/fx/StudioEnv";
 import { moonFragment } from "@/components/fx/Shaders";
 
 function Moon() {
   const matRef = useRef<THREE.Mesh>(null);
   const material = useRef<THREE.ShaderMaterial | null>(null);
+  const clouds = useLoader(THREE.TextureLoader, "/fx/clouds_noise.png");
 
   if (!material.current) {
     material.current = new THREE.ShaderMaterial({
@@ -18,6 +20,8 @@ function Moon() {
         uTime: { value: 0 },
         uColorA: { value: new THREE.Color("#d9d4c8") },
         uColorB: { value: new THREE.Color("#8a8578") },
+        uClouds: { value: null },
+        uCloudStrength: { value: 0 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -33,6 +37,15 @@ function Moon() {
       fragmentShader: moonFragment,
     });
   }
+
+  useEffect(() => {
+    const mat = material.current;
+    if (!mat || !clouds) return;
+    clouds.wrapS = THREE.RepeatWrapping;
+    clouds.wrapT = THREE.RepeatWrapping;
+    mat.uniforms.uClouds.value = clouds;
+    mat.uniforms.uCloudStrength.value = 0.35;
+  }, [clouds]);
 
   useFrame(({ clock }) => {
     const mat = material.current;
@@ -105,6 +118,7 @@ export default function Hero3D() {
       <GazeCamera intensity={0.5} lookAt={1.4} />
       <ambientLight intensity={0.35} />
       <pointLight position={[3, 3, 2]} intensity={30} color="#fff3dd" />
+      <StudioEnv />
       <Backdrop colorA="#1d1d1d" colorB="#26231d" z={-8} />
       <Moon />
       <Ground />

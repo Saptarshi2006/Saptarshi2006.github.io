@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Particles from "@/components/fx/Particles";
+import StudioEnv from "@/components/fx/StudioEnv";
 import { baseVertex, portalFragment } from "@/components/fx/Shaders";
 
 export default function SynapsePortal3D() {
@@ -39,6 +40,7 @@ export default function SynapsePortal3D() {
 
   return (
     <group>
+      <StudioEnv />
       <group ref={group}>
         <mesh material={material.current} position={[0, 0, 0.1]}>
           <circleGeometry args={[1.5, 64]} />
