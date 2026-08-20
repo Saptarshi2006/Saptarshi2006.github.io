@@ -69,7 +69,7 @@ export default function MSDFText({
     const texW = font.common.scaleW;
     const texH = font.common.scaleH;
 
-    const positions = new Float32Array(glyphs.length * 4 * 2);
+    const positions = new Float32Array(glyphs.length * 4 * 3);
     const uvs = new Float32Array(glyphs.length * 4 * 2);
     const indices: number[] = [];
     let pi = 0;
@@ -83,8 +83,8 @@ export default function MSDFText({
       const w = b.width;
       const h = b.height;
 
-      positions.set([x, y, x, y + h, x + w, y + h, x + w, y], pi);
-      pi += 8;
+      positions.set([x, y, 0, x, y + h, 0, x + w, y + h, 0, x + w, y, 0], pi);
+      pi += 12;
 
       const u0 = b.x / texW;
       const u1 = (b.x + w) / texW;
@@ -98,7 +98,7 @@ export default function MSDFText({
     });
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 2));
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     geo.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeBoundingBox();
