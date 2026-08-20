@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import Backdrop from "@/components/fx/Backdrop";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 import { baseVertex, portalFragment } from "@/components/fx/Shaders";
@@ -41,6 +42,7 @@ export default function SynapsePortal3D() {
   return (
     <group>
       <StudioEnv />
+      <Backdrop colorA="#0e1328" colorB="#1d1d1d" opacity={0.92} z={-7} />
       <group ref={group}>
         <mesh material={material.current} position={[0, 0, 0.1]}>
           <circleGeometry args={[1.5, 64]} />

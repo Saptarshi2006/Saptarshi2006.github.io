@@ -1,5 +1,7 @@
 "use client";
 
+import CanvasStage from "@/components/fx/CanvasStage";
+import Backdrop from "@/components/fx/Backdrop";
 import RevealText from "@/components/fx/RevealText";
 
 export default function AboutScene() {
@@ -7,12 +9,15 @@ export default function AboutScene() {
     <section
       id="about"
       data-scene
-      className="relative flex min-h-[100svh] flex-col items-center justify-center gap-14 px-6 py-28 sm:px-10"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center gap-14 overflow-hidden px-6 py-28 sm:px-10"
     >
+      <CanvasStage className="absolute inset-0">
+        <Backdrop colorA="#1d1d1d" colorB="#26231d" opacity={0.55} z={-6} />
+      </CanvasStage>
       <RevealText
         text="01 — ABOUT"
         as="span"
-        className="text-techno text-xs tracking-[0.35em] text-crimson"
+        className="relative z-10 text-techno text-xs tracking-[0.35em] text-crimson"
       />
 
       <RevealText

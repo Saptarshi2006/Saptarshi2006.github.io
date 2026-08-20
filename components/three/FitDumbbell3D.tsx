@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import Backdrop from "@/components/fx/Backdrop";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 
@@ -31,6 +32,7 @@ export default function FitDumbbell3D() {
   return (
     <group>
       <StudioEnv />
+      <Backdrop colorA="#0f1a14" colorB="#1d1d1d" opacity={0.9} z={-7} />
       <group ref={group} rotation={[0.15, 0.4, 0]}>
         <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
           <cylinderGeometry args={[0.09, 0.09, 2.9, 24]} />

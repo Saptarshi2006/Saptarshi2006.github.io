@@ -1,5 +1,7 @@
 "use client";
 
+import CanvasStage from "@/components/fx/CanvasStage";
+import Backdrop from "@/components/fx/Backdrop";
 import RevealText from "@/components/fx/RevealText";
 import { skills } from "@/lib/content";
 
@@ -8,8 +10,11 @@ export default function SkillsScene() {
     <section
       id="skills"
       data-scene
-      className="relative flex min-h-[100svh] flex-col items-center justify-center gap-16 px-6 py-28 sm:px-10"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center gap-16 overflow-hidden px-6 py-28 sm:px-10"
     >
+      <CanvasStage className="absolute inset-0">
+        <Backdrop colorA="#1d1d1d" colorB="#1e221e" opacity={0.5} z={-6} />
+      </CanvasStage>
       <RevealText
         text="02 — STACK"
         as="span"

@@ -3,6 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import Backdrop from "@/components/fx/Backdrop";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 
@@ -49,6 +50,7 @@ export default function CartisCoin3D() {
   return (
     <group>
       <StudioEnv />
+      <Backdrop colorA="#1d1d1d" colorB="#2a2414" opacity={0.9} z={-7} />
       <group ref={group}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[1.15, 1.15, 0.16, 64]} />

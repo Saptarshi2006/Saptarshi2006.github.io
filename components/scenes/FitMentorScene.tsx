@@ -31,39 +31,39 @@ export default function FitMentorScene() {
 
   return (
     <CaseStudy project={project} id="fitmentor" reversed>
-      <div className="flex h-full flex-col items-center justify-center gap-6">
-        <CanvasStage className="h-[55%] w-full" dpr={[1, 1.5]}>
+      <>
+        <CanvasStage className="h-full w-full" dpr={[1, 1.5]}>
           <ambientLight intensity={0.5} />
           <pointLight position={[0, 3, 4]} intensity={20} color="#ffffff" />
           <FitDumbbell3D />
           <MSDFText
             position={[0, 0.15, -2.8]}
             color="#6dd993"
-            opacity={0.16}
+            opacity={0.14}
             letterSpacing={16}
           >
             FITMENTOR
           </MSDFText>
         </CanvasStage>
-        <div className="flex flex-col items-center gap-3">
-          {variants.map((v, i) => (
-            <button
-              key={v.key}
-              onClick={() => setActive(i)}
-              className={`text-techno text-[11px] tracking-[0.3em] transition-all duration-300 ${
-                active === i
-                  ? "text-paper"
-                  : "text-white/30 hover:text-white/70"
-              }`}
-            >
-              {v.label}
-            </button>
-          ))}
-          <p className="text-body-light mt-2 max-w-xs text-center text-xs text-white/50">
+        <div className="pointer-events-auto absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2">
+          <div className="flex gap-4">
+            {variants.map((v, i) => (
+              <button
+                key={v.key}
+                onClick={() => setActive(i)}
+                className={`text-techno text-[10px] tracking-[0.25em] transition-colors duration-300 ${
+                  active === i ? "text-paper" : "text-white/30 hover:text-white/60"
+                }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-body-light max-w-xs text-center text-[11px] text-white/50">
             {variants[active].copy}
           </p>
         </div>
-      </div>
+      </>
     </CaseStudy>
   );
 }

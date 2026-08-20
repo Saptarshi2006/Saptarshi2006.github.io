@@ -43,8 +43,8 @@ export default function SynapseScene() {
 
   return (
     <CaseStudy project={project} id="synapse">
-      <div className="flex h-full flex-col items-center justify-center gap-8">
-        <CanvasStage className="h-[60%] w-full" dpr={[1, 1.5]}>
+      <>
+        <CanvasStage className="h-full w-full" dpr={[1, 1.5]}>
           <ambientLight intensity={0.4} />
           <SynapsePortal3D />
           <MSDFText
@@ -56,7 +56,7 @@ export default function SynapseScene() {
             SYNAPSE
           </MSDFText>
         </CanvasStage>
-        <div className="flex flex-col items-center gap-3">
+        <div className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2">
           <span className="text-techno text-[10px] tracking-[0.3em] text-white/30">
             WHAT IT PLANS
           </span>
@@ -74,7 +74,7 @@ export default function SynapseScene() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </CaseStudy>
   );
 }

@@ -68,65 +68,61 @@ export default function CaseStudy({
     <section
       id={id}
       ref={sectionRef}
-      className="relative flex h-[100svh] items-center overflow-hidden bg-ink"
+      className="relative h-[100svh] overflow-hidden bg-ink"
+      onMouseEnter={() => setCursorVariant("drag")}
+      onMouseLeave={() => setCursorVariant("default")}
     >
+      <div data-cs-3d className="absolute inset-0">
+        {children}
+      </div>
+
       <div
         data-cs-inner
-        className={`grid w-full grid-cols-1 items-center gap-10 px-6 sm:px-10 lg:grid-cols-2 lg:gap-16 ${
-          reversed ? "lg:[direction:rtl]" : ""
-        }`}
+        className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
       >
-        <div className="relative h-[42svh] lg:h-[70svh]" data-cs-3d>
-          <div
-            className="absolute inset-0"
-            onMouseEnter={() => setCursorVariant("drag")}
-            onMouseLeave={() => setCursorVariant("default")}
-          >
-            {children}
-          </div>
-        </div>
+        <span className="text-techno text-[11px] tracking-[0.35em] text-white/40">
+          CASE STUDY {project.index} — {project.eyebrow}
+        </span>
+        <h3
+          className="heading-display mt-4 text-[16vw] leading-none sm:text-[10vw]"
+          style={{ color: project.accent, textShadow: "0 8px 40px rgba(0,0,0,.7)" }}
+        >
+          {project.title}
+        </h3>
+        <p className="heading-display mt-3 max-w-xl text-xl text-paper drop-shadow-[0_4px_20px_rgba(0,0,0,.8)] sm:text-2xl">
+          {project.tagline}
+        </p>
+        <p className="text-body-light mt-3 max-w-lg text-sm text-white/70">
+          {project.description}
+        </p>
 
-        <div className="flex flex-col gap-6 lg:[direction:ltr]">
-          <span className="text-techno text-[11px] tracking-[0.35em] text-white/40">
-            CASE STUDY {project.index} — {project.eyebrow}
-          </span>
-          <h3
-            className="heading-display text-[13vw] leading-none sm:text-[8vw]"
-            style={{ color: project.accent }}
-          >
-            {project.title}
-          </h3>
-          <p className="heading-display text-2xl text-paper">{project.tagline}</p>
-          <p className="text-body-light text-sm text-white/60">{project.description}</p>
-
-          <div className="flex flex-wrap gap-2">
-            {project.stack.map((t) => (
-              <span
-                key={t}
-                className="border border-white/15 px-3 py-1 text-techno text-[10px] tracking-widest text-white/50"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-
-          {project.url && (
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={() => setCursorVariant("hover")}
-              onMouseLeave={() => setCursorVariant("default")}
-              className="text-techno group mt-2 flex w-fit items-center gap-3 text-sm tracking-[0.25em] text-paper transition-colors hover:text-crimson"
+        <div className="pointer-events-auto mt-6 flex flex-wrap justify-center gap-2">
+          {project.stack.map((t) => (
+            <span
+              key={t}
+              className="border border-white/20 bg-ink/20 px-3 py-1 text-techno text-[10px] tracking-widest text-white/70 backdrop-blur-sm"
             >
-              VISIT LIVE SITE
-              <span className="transition-transform duration-300 group-hover:translate-x-2">
-                →
-              </span>
-            </a>
-          )}
+              {t}
+            </span>
+          ))}
         </div>
+
+        {project.url && (
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onMouseEnter={() => setCursorVariant("hover")}
+            onMouseLeave={() => setCursorVariant("drag")}
+            className="pointer-events-auto text-techno group mt-6 flex w-fit items-center gap-3 border border-white/20 bg-paper px-6 py-3 text-sm tracking-[0.25em] text-ink transition-colors hover:bg-crimson hover:text-paper"
+          >
+            VISIT LIVE SITE
+            <span className="transition-transform duration-300 group-hover:translate-x-2">→</span>
+          </a>
+        )}
       </div>
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-ink/35" />
     </section>
   );
 }
