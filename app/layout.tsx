@@ -6,23 +6,38 @@ export const metadata: Metadata = {
   title: "Saptarshi Mukherjee — Full-Stack Engineer",
   description:
     "Saptarshi Mukherjee is a full-stack engineer building AI-powered products. Cartis, FitMentor and Synapse — built to ship, shipped to learn.",
+  metadataBase: new URL("https://saptarshi2006.github.io"),
   openGraph: {
     title: "Saptarshi Mukherjee — Full-Stack Engineer",
     description:
       "Immersive portfolio of Saptarshi Mukherjee. AI financial coaching, fitness coaching and campus platform case studies.",
     type: "website",
+    url: "/",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Saptarshi Mukherjee — Full-Stack Engineer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Saptarshi Mukherjee — Full-Stack Engineer",
+    description: "Immersive portfolio of Saptarshi Mukherjee.",
+    images: ["/og.png"],
+  },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={fontVariables}>
-      <head>
-        <link
-          rel="icon"
-          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d1d1d'/%3E%3Ctext x='50' y='68' font-size='56' font-family='Georgia,serif' fill='%23ffffff' text-anchor='middle'%3ESM%3C/text%3E%3C/svg%3E"
-        />
-      </head>
       <body>{children}</body>
     </html>
   );
