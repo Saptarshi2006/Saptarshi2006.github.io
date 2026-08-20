@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import Backdrop from "@/components/fx/Backdrop";
+import BloomFx from "@/components/fx/BloomFx";
 import Particles from "@/components/fx/Particles";
 import GazeCamera from "@/components/fx/GazeCamera";
 import StudioEnv from "@/components/fx/StudioEnv";
@@ -134,6 +135,7 @@ export default function Hero3D() {
         ENGINEER
       </MSDFText>
       <Particles count={700} spread={[18, 9, 3]} size={0.04} opacity={0.3} />
+      <BloomFx intensity={0.45} luminanceThreshold={0.7} />
     </>
   );
 }

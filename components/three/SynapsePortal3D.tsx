@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Backdrop from "@/components/fx/Backdrop";
+import BloomFx from "@/components/fx/BloomFx";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 import { baseVertex, portalFragment } from "@/components/fx/Shaders";
@@ -61,6 +62,7 @@ export default function SynapsePortal3D() {
         </mesh>
       </group>
       <Particles count={320} spread={[4.5, 4.5, 2.5]} size={0.03} color="#9ad8ff" opacity={0.55} />
+      <BloomFx intensity={0.7} luminanceThreshold={0.55} />
     </group>
   );
 }

@@ -9,6 +9,7 @@ import { useUI } from "@/lib/store";
 import CustomCursor from "@/components/ui/CustomCursor";
 import HeaderMenu from "@/components/ui/HeaderMenu";
 import Loader from "@/components/ui/Loader";
+import ScrollProgress from "@/components/ui/ScrollProgress";
 import Footer from "@/components/ui/Footer";
 import HeroScene from "@/components/scenes/HeroScene";
 import AboutScene from "@/components/scenes/AboutScene";
@@ -60,6 +61,7 @@ export default function Experience() {
   return (
     <div ref={rootRef} className="relative min-h-screen bg-ink text-paper">
       <Loader />
+      <ScrollProgress />
       <CustomCursor />
       <HeaderMenu />
       <main className="relative">

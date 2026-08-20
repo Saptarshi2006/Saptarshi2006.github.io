@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Backdrop from "@/components/fx/Backdrop";
+import BloomFx from "@/components/fx/BloomFx";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 
@@ -62,6 +63,7 @@ export default function CartisCoin3D() {
         </mesh>
       </group>
       <Particles count={260} spread={[4, 4, 2]} size={0.035} color="#f7e29a" opacity={0.5} />
+      <BloomFx intensity={0.6} luminanceThreshold={0.6} />
     </group>
   );
 }

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Backdrop from "@/components/fx/Backdrop";
+import BloomFx from "@/components/fx/BloomFx";
 import Particles from "@/components/fx/Particles";
 import StudioEnv from "@/components/fx/StudioEnv";
 
@@ -48,6 +49,7 @@ export default function FitDumbbell3D() {
         <Plate x={1.4} radius={0.62} color={steel} />
       </group>
       <Particles count={200} spread={[4, 3, 2]} size={0.035} color={accent} opacity={0.4} />
+      <BloomFx intensity={0.5} luminanceThreshold={0.65} />
     </group>
   );
 }
