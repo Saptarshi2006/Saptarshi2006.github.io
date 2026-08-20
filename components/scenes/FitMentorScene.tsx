@@ -4,6 +4,7 @@ import { useState } from "react";
 import CaseStudy from "@/components/scenes/CaseStudy";
 import CanvasStage from "@/components/fx/CanvasStage";
 import FitDumbbell3D from "@/components/three/FitDumbbell3D";
+import FloatText from "@/components/three/FloatText";
 import { projects } from "@/lib/content";
 
 const variants = [
@@ -35,6 +36,15 @@ export default function FitMentorScene() {
           <ambientLight intensity={0.5} />
           <pointLight position={[0, 3, 4]} intensity={20} color="#ffffff" />
           <FitDumbbell3D />
+          <FloatText
+            position={[0, 0.15, -2.8]}
+            size={0.95}
+            color="#6dd993"
+            opacity={0.16}
+            letterSpacing={0.16}
+          >
+            FITMENTOR
+          </FloatText>
         </CanvasStage>
         <div className="flex flex-col items-center gap-3">
           {variants.map((v, i) => (

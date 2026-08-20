@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import CaseStudy from "@/components/scenes/CaseStudy";
 import CanvasStage from "@/components/fx/CanvasStage";
 import SynapsePortal3D from "@/components/three/SynapsePortal3D";
+import FloatText from "@/components/three/FloatText";
 import { projects } from "@/lib/content";
 
 const features = [
@@ -46,6 +47,15 @@ export default function SynapseScene() {
         <CanvasStage className="h-[60%] w-full" dpr={[1, 1.5]}>
           <ambientLight intensity={0.4} />
           <SynapsePortal3D />
+          <FloatText
+            position={[0, 0.2, -2.7]}
+            size={1.0}
+            color="#6fccfb"
+            opacity={0.15}
+            letterSpacing={0.16}
+          >
+            SYNAPSE
+          </FloatText>
         </CanvasStage>
         <div className="flex flex-col items-center gap-3">
           <span className="text-techno text-[10px] tracking-[0.3em] text-white/30">
