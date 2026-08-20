@@ -7,6 +7,7 @@ import Backdrop from "@/components/fx/Backdrop";
 import Particles from "@/components/fx/Particles";
 import GazeCamera from "@/components/fx/GazeCamera";
 import StudioEnv from "@/components/fx/StudioEnv";
+import MSDFText from "@/components/three/MSDFText";
 import { moonFragment } from "@/components/fx/Shaders";
 
 function Moon() {
@@ -123,6 +124,15 @@ export default function Hero3D() {
       <Moon />
       <Ground />
       <Mountains />
+      <MSDFText
+        position={[0, 0.5, -4.5]}
+        color="#d9d4c8"
+        opacity={0.1}
+        letterSpacing={28}
+        width={9}
+      >
+        ENGINEER
+      </MSDFText>
       <Particles count={700} spread={[18, 9, 3]} size={0.04} opacity={0.3} />
     </>
   );

@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import createLayout from "layout-bmfont-text";
+import { useUI } from "@/lib/store";
 
 const msdfVertex = /* glsl */ `
   varying vec2 vUv;
@@ -50,6 +51,7 @@ export default function MSDFText({
   maxWidth,
 }: MSDFTextProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const reducedMotion = useUI((s) => s.reducedMotion);
   const atlas = useLoader(THREE.TextureLoader, "/msdf/nikkei-ultra.png");
   const fontData = useLoader(THREE.FileLoader, "/msdf/nikkei-ultra.json");
 
@@ -134,6 +136,7 @@ export default function MSDFText({
   }, [atlas, color, opacity]);
 
   useFrame(({ clock }) => {
+    if (reducedMotion) return;
     if (!meshRef.current) return;
     const t = clock.elapsedTime;
     meshRef.current.rotation.y = Math.sin(t * 0.15) * 0.08;
