@@ -1,82 +1,56 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { initLenis } from "@/lib/smooth";
-import { useReducedMotion } from "@/lib/useReducedMotion";
-import { useUI } from "@/lib/store";
-
+import { useState, useCallback } from "react";
+import { SceneProvider } from "@/context/SceneContext";
+import { PerformanceProvider } from "@/context/PerformanceContext";
+import { AudioProvider } from "@/context/AudioManager";
+import { AchievementsProvider } from "@/context/AchievementsContext";
 import CustomCursor from "@/components/ui/CustomCursor";
-import HeaderMenu from "@/components/ui/HeaderMenu";
-import Loader from "@/components/ui/Loader";
-import ScrollProgress from "@/components/ui/ScrollProgress";
-import Footer from "@/components/ui/Footer";
-import HeroScene from "@/components/scenes/HeroScene";
-import AboutScene from "@/components/scenes/AboutScene";
-import SkillsScene from "@/components/scenes/SkillsScene";
-import WorksScene from "@/components/scenes/WorksScene";
-import CartisScene from "@/components/scenes/CartisScene";
-import FitMentorScene from "@/components/scenes/FitMentorScene";
-import SynapseScene from "@/components/scenes/SynapseScene";
-import CaseStudiesCard from "@/components/scenes/CaseStudiesCard";
-import MarqueeScene from "@/components/scenes/MarqueeScene";
-import ContactScene from "@/components/scenes/ContactScene";
+import Preloader from "@/components/canvas/Preloader";
+import ExperienceCanvas from "@/components/canvas/ExperienceCanvas";
+import { NavigationUI, GlobalOverlay } from "@/components/canvas/OverlayUI";
 
 export default function Experience() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const setActive = useUI((s) => s.setActive);
-  const setReducedMotion = useUI((s) => s.setReducedMotion);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(false);
 
-  useEffect(() => {
-    setReducedMotion(reduced);
-    if (reduced) return;
-
-    initLenis();
-
-    const triggers: ScrollTrigger[] = [];
-    const sections = rootRef.current?.querySelectorAll<HTMLElement>("[data-scene]");
-    sections?.forEach((section) => {
-      const t = ScrollTrigger.create({
-        trigger: section,
-        start: "top 50%",
-        end: "bottom 50%",
-        onToggle: (self) => {
-          if (self.isActive) setActive(section.id);
-        },
-      });
-      triggers.push(t);
-    });
-
-    const onRefresh = () => ScrollTrigger.refresh();
-    window.addEventListener("load", onRefresh);
-    return () => {
-      window.removeEventListener("load", onRefresh);
-      triggers.forEach((t) => t.kill());
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-      gsap.ticker.lagSmoothing(1);
-    };
-  }, [setActive, setReducedMotion, reduced]);
+  const handleSceneReady = useCallback(() => setSceneReady(true), []);
+  const handlePreloaderComplete = useCallback(() => setPreloaderDone(true), []);
 
   return (
-    <div ref={rootRef} className="relative min-h-screen bg-ink text-paper">
-      <Loader />
-      <ScrollProgress />
-      <CustomCursor />
-      <HeaderMenu />
-      <main className="relative">
-        <HeroScene />
-        <AboutScene />
-        <SkillsScene />
-        <WorksScene />
-        <CartisScene />
-        <FitMentorScene />
-        <SynapseScene />
-        <CaseStudiesCard />
-        <MarqueeScene />
-        <ContactScene />
-      </main>
-      <Footer />
-    </div>
+    <PerformanceProvider>
+      <AchievementsProvider>
+        <AudioProvider>
+          <SceneProvider>
+            <div className="relative min-h-[100svh] bg-[#faf8f3] text-ink">
+              {/* SEO fallback - visible to crawlers, sr-only */}
+              <div className="sr-only">
+                <h1>Saptarshi Mukherjee — Full-Stack Engineer</h1>
+                <p>
+                  Full-stack engineer building AI-native products. Cartis AI financial coach, FitMentor AI fitness coach, Synapse campus platform.
+                </p>
+                <section>
+                  <h2>Projects</h2>
+                  <ul>
+                    <li>Cartis — AI Financial Coach (Rust, Axum, Next.js)</li>
+                    <li>FitMentor — AI Fitness Coach (TanStack Start, Rust)</li>
+                    <li>Synapse — Campus Portal (Next.js, NestJS, WebGL)</li>
+                  </ul>
+                </section>
+              </div>
+
+              <Preloader onComplete={handlePreloaderComplete} ready={sceneReady} />
+              <CustomCursor />
+              <ExperienceCanvas onSceneReady={handleSceneReady} />
+              <NavigationUI />
+              <GlobalOverlay />
+
+              {/* sr-only helpers */}
+              <style>{`.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}`}</style>
+            </div>
+          </SceneProvider>
+        </AudioProvider>
+      </AchievementsProvider>
+    </PerformanceProvider>
   );
 }
