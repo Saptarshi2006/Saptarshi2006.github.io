@@ -44,19 +44,33 @@ export default function Preloader({ onComplete, ready }: { onComplete: () => voi
     return `polygon(100% 0%, ${tearPoints.map((p) => `${p[0]}% ${p[1]}%`).join(", ")}, 100% 100%, 100% 0%)`;
   }, [tearPoints]);
 
-  // track THREE loading manager
+  // Unified progress: GSAP fake to 100 + real THREE loader can jump ahead
   useEffect(() => {
+    const counter = { v: 0 };
     let raf = 0;
-    const origStart = THREE.DefaultLoadingManager.onStart;
+
+    // GSAP fake progress — always runs to 100, ensures tear even with procedural textures
+    const tween = gsap.to(counter, {
+      v: 100,
+      duration: 1.8,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        // only go forward, let real loader override if it's ahead
+        setProgress((prev) => Math.max(prev, counter.v));
+      },
+    });
+
+    // Also track THREE loader — if it reports, jump ahead
     const origProg = THREE.DefaultLoadingManager.onProgress;
     const origLoad = THREE.DefaultLoadingManager.onLoad;
-
-    THREE.DefaultLoadingManager.onStart = (url, loaded, total) => {
-      origStart?.(url, loaded, total);
-    };
     THREE.DefaultLoadingManager.onProgress = (url, loaded, total) => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setProgress((loaded / total) * 100));
+      raf = requestAnimationFrame(() => {
+        const pct = (loaded / total) * 100;
+        setProgress((prev) => Math.max(prev, pct));
+        // if real loader is behind fake, push fake ahead
+        if (pct > counter.v) counter.v = pct;
+      });
       origProg?.(url, loaded, total);
     };
     THREE.DefaultLoadingManager.onLoad = () => {
@@ -64,28 +78,21 @@ export default function Preloader({ onComplete, ready }: { onComplete: () => voi
       setProgress(100);
       origLoad?.();
     };
+
+    // Fail-safe: force 100 after 2.8s no matter what (covers the 18% stuck bug)
+    const failSafe = setTimeout(() => {
+      gsap.killTweensOf(counter);
+      setProgress(100);
+    }, 2800);
+
     return () => {
-      THREE.DefaultLoadingManager.onStart = origStart;
+      tween.kill();
+      clearTimeout(failSafe);
+      cancelAnimationFrame(raf);
       THREE.DefaultLoadingManager.onProgress = origProg;
       THREE.DefaultLoadingManager.onLoad = origLoad;
     };
   }, []);
-
-  // fake progress if no textures loading (dev)
-  useEffect(() => {
-    if (progress > 0) return;
-    let v = 0;
-    const iv = setInterval(() => {
-      v += Math.random() * 18;
-      if (v >= 96) v = 96;
-      setProgress(v);
-    }, 180);
-    const t = setTimeout(() => clearInterval(iv), 4000);
-    return () => {
-      clearInterval(iv);
-      clearTimeout(t);
-    };
-  }, [progress]);
 
   // animate tear line dash based on progress
   useEffect(() => {
