@@ -106,14 +106,12 @@ export default function AboutRoom({ scrollOffset = 0 }: { scrollOffset?: number 
   // scrollOffset moves airplane forward through sky (z)
   const planeZ = -scrollOffset * 0.08; // airplane flies forward
 
+  // Edit: less personal skill-spam, more story — like itom's balloons were tech but curated, now keep only 3 hero tech + story
   const balloons = useMemo(
     () => [
-      { label: "RUST", accent: "#c82924", x: -2.2, y: 0.9, z: -2, s: 1.2 },
-      { label: "REACT", accent: "#6fccfb", x: 2.1, y: 1.3, z: -4, s: 1.35 },
-      { label: "THREE.JS", accent: "#dfaf49", x: -0.6, y: 1.6, z: -6, s: 1.2 },
-      { label: "NEXT.JS", accent: "#1a1a1a", x: 2.8, y: 0.4, z: -8, s: 1 },
-      { label: "GSAP", accent: "#6dd993", x: -2.8, y: 0.2, z: -10, s: 1 },
-      { label: "GRAPHQL", accent: "#ff7e5f", x: 0.2, y: 1.0, z: -12, s: 0.9 },
+      { label: "CARTIS\nSHIPPED", accent: "#dfaf49", x: -2.2, y: 0.9, z: -2, s: 1.25 },
+      { label: "FITMENTOR\nSHIPPED", accent: "#6dd993", x: 2.1, y: 1.3, z: -4, s: 1.3 },
+      { label: "SYNAPSE\nCAMPUS", accent: "#6fccfb", x: -0.6, y: 1.6, z: -7, s: 1.15 },
     ],
     []
   );

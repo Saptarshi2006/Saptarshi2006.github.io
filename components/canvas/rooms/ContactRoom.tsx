@@ -66,15 +66,13 @@ function Barrel({ label, href, accent, pos }: { label: string; href: string; acc
 }
 
 export default function ContactRoom() {
-  // Perfect clone wants ALL your socials as barrels — like itom's beach (was 3, now 6)
+  // Curated: 4 barrels only — LinkedIn hero + GitHub + X + Email — cleaner, like itom's 3 but perfect
   const barrels = useMemo(
     () => [
-      { label: "LinkedIn\nin →", href: identity.linkedin, accent: "#0a66c2", pos: [0, -0.22, 1.85] as [number, number, number] }, // center, LinkedIn most important
-      { label: "GitHub\n→", href: socials.find((s) => s.label === "GitHub")!.href, accent: "#1a1a1a", pos: [-2.35, -0.12, 1.35] as [number, number, number] },
-      { label: "X / Twitter\n𝕏 →", href: socials.find((s) => s.label.includes("X"))!.href, accent: "#000000", pos: [2.35, -0.1, 1.32] as [number, number, number] },
-      { label: "Instagram\n◎ →", href: socials.find((s) => s.label === "Instagram")!.href, accent: "#e4405f", pos: [-1.35, -0.08, 0.85] as [number, number, number] },
-      { label: "YouTube\n▶ →", href: socials.find((s) => s.label === "YouTube")!.href, accent: "#ff0000", pos: [1.35, -0.06, 0.82] as [number, number, number] },
-      { label: "Email\n✉ →", href: `mailto:${identity.email}`, accent: "#c82924", pos: [0, -0.1, 0.35] as [number, number, number] },
+      { label: "LinkedIn\nin →", href: identity.linkedin, accent: "#0a66c2", pos: [0, -0.22, 1.85] as [number, number, number] },
+      { label: "GitHub\n→", href: socials.find((s) => s.label === "GitHub")!.href, accent: "#1a1a1a", pos: [-1.95, -0.12, 1.25] as [number, number, number] },
+      { label: "X\n𝕏 →", href: socials.find((s) => s.label.includes("X"))!.href, accent: "#000000", pos: [1.95, -0.1, 1.22] as [number, number, number] },
+      { label: "Email\n✉ →", href: `mailto:${identity.email}`, accent: "#c82924", pos: [0, -0.08, 0.55] as [number, number, number] },
     ],
     []
   );

@@ -59,22 +59,20 @@ function Monitor({ label, accent, index, offset }: { label: string; accent: stri
 }
 
 export default function StudioRoom({ scrollOffset = 0 }: { scrollOffset?: number }) {
-  // skills as monitors plus extras
+  // Perfect itom STUDIO is content — not a skill list. Show your actual work as floating screens (like itom's blog/video/phone).
   const items = useMemo(
     () => [
-      { label: "RUST\nAXUM • SQLX", accent: "#c82924" },
-      { label: "TYPESCRIPT\nNEXT • REACT", accent: "#6fccfb" },
-      { label: "WEBGL\nTHREE • R3F", accent: "#dfaf49" },
-      { label: "PYTHON\nFASTAPI", accent: "#6dd993" },
-      { label: "GLEAM\nMIST", accent: "#a78bfa" },
-      { label: "GRAPHQL\nAPOLLO", accent: "#ff7e5f" },
-      ...skills.map((s) => ({ label: `${s.name}\n${s.note}`, accent: "#1a1a1a" })),
+      { label: "GITHUB\n3 SHIPPED →", accent: "#1a1a1a" },
+      { label: "LINKEDIN\nBUILD LOG →", accent: "#0a66c2" },
+      { label: "YOUTUBE\nDEMO →", accent: "#ff0000" },
+      { label: "WRITING\nNOTES →", accent: "#c82924" },
+      { label: "CODE\nRUST • TS →", accent: "#dfaf49" },
     ],
     []
   );
 
-  // triple for loop
-  const list = useMemo(() => [...items, ...items, ...items], [items]);
+  // double for infinite but keep it airy (not 3x crowded)
+  const list = useMemo(() => [...items, ...items], [items]);
 
   return (
     <group position={[0, 0, -32]}>
