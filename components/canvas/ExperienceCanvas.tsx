@@ -16,14 +16,32 @@ import ContactRoom from "./rooms/ContactRoom";
 
 function SceneBackground() {
   const { scene } = useThree();
+  const paperTex = (() => {
+    try {
+      // cloned paper texture for perfect itom fidelity; fallback to color if not loaded
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const t = new THREE.TextureLoader().load("/textures/paper-texture.webp");
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(3, 3);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    } catch {
+      return null;
+    }
+  })();
   useEffect(() => {
-    scene.background = new THREE.Color("#faf8f3");
+    if (paperTex) {
+      scene.background = paperTex;
+    } else {
+      scene.background = new THREE.Color("#faf8f3");
+    }
     scene.fog = new THREE.Fog("#faf8f3", 22, 58);
     return () => {
       scene.background = null;
       scene.fog = null;
     };
-  }, [scene]);
+  }, [scene, paperTex]);
   return null;
 }
 

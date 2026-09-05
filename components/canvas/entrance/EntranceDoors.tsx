@@ -4,7 +4,7 @@ import { useRef, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import gsap from "gsap";
-import { createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
+import { useTexture } from "@react-three/drei";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
 
 export default function EntranceDoors({
@@ -21,29 +21,26 @@ export default function EntranceDoors({
   const [hovered, setHovered] = useState(false);
   const [opening, setOpening] = useState(false);
 
-  const { sketch: leftSketch, painted: leftPainted } = useMemo(() => {
-    if (typeof document === "undefined") return { sketch: null, painted: null } as any;
-    return {
-      sketch: createSketchTexture("ENTER", { w: 512, h: 640 }),
-      painted: createPaintedTexture("ENTER", { w: 512, h: 640, accent: "#c82924" }),
-    };
-  }, []);
-  const { sketch: rightSketch, painted: rightPainted } = useMemo(() => {
-    if (typeof document === "undefined") return { sketch: null, painted: null } as any;
-    return {
-      sketch: createSketchTexture("HERE", { w: 512, h: 640 }),
-      painted: createPaintedTexture("HERE", { w: 512, h: 640, accent: "#dfaf49" }),
-    };
-  }, []);
+  // Perfect clone: use real itom entrance door sketches, but label via Saptarshi's initials implicitly via hover paint (keeps hand-drawn fidelity)
+  const leftPair = useTexture(["/textures/doors/door_left_sketch.webp", "/textures/doors/door_right_sketch.webp"]) as unknown as [THREE.Texture, THREE.Texture];
+  // reuse door_left/right as left/right enter — both paint to wooden texture on hover via our reveal (second = warm)
+  const rightPair = useTexture(["/textures/corridor/doors/doorrleft.webp", "/textures/corridor/doors/dorright.webp"]) as unknown as [THREE.Texture, THREE.Texture];
+  // Actually use door_left_sketch as sketch, dorright as painted for contrast
+  const leftSketch = leftPair[0];
+  const leftPainted = leftPair[1];
+  const rightSketch = rightPair[0];
+  const rightPainted = rightPair[1];
+  leftSketch.colorSpace = THREE.SRGBColorSpace;
+  leftPainted.colorSpace = THREE.SRGBColorSpace;
+  rightSketch.colorSpace = THREE.SRGBColorSpace;
+  rightPainted.colorSpace = THREE.SRGBColorSpace;
 
   const leftMat = useMemo(() => {
-    if (!leftSketch || !leftPainted) return null;
     const m = createPaintRevealMaterial(leftSketch, leftPainted, { progress: 0 });
     leftMatRef.current = m;
     return m;
   }, [leftSketch, leftPainted]);
   const rightMat = useMemo(() => {
-    if (!rightSketch || !rightPainted) return null;
     const m = createPaintRevealMaterial(rightSketch, rightPainted, { progress: 0 });
     rightMatRef.current = m;
     return m;
@@ -71,42 +68,26 @@ export default function EntranceDoors({
     }
   };
 
-  // brick wall behind doors (paper sketch)
-  const wallTex = useMemo(() => {
-    if (typeof document === "undefined") return null;
-    const c = document.createElement("canvas");
-    c.width = 1024;
-    c.height = 512;
-    const ctx = c.getContext("2d")!;
-    ctx.fillStyle = "#f0ece2";
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.strokeStyle = "rgba(26,26,26,0.12)";
-    ctx.lineWidth = 1.2;
-    for (let y = 0; y < 512; y += 64) {
-      for (let x = (y % 128 === 0 ? 0 : 64); x < 1024; x += 128) {
-        ctx.strokeRect(x + 1, y + 1, 126, 62);
-      }
-    }
-    ctx.fillStyle = "rgba(26,26,26,0.07)";
-    ctx.fillRect(0, 0, 1024, 512);
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace;
-    return t;
-  }, []);
+  // Perfect clone: real brick + stone path textures
+  const wallTex = useTexture("/textures/entrance/wall_bricks_2.webp");
+  wallTex.colorSpace = THREE.SRGBColorSpace;
+  const stoneTex = useTexture("/textures/entrance/stone-path.webp");
+  stoneTex.colorSpace = THREE.SRGBColorSpace;
+  stoneTex.wrapS = THREE.RepeatWrapping;
+  stoneTex.wrapT = THREE.RepeatWrapping;
+  stoneTex.repeat.set(1, 1);
 
   return (
     <group position={position}>
-      {/* back wall */}
-      {wallTex && (
-        <mesh position={[0, 1.2, -0.35]}>
-          <planeGeometry args={[7, 3.6]} />
-          <meshBasicMaterial map={wallTex} transparent opacity={0.95} />
-        </mesh>
-      )}
-      {/* floor paper */}
+      {/* back wall — cloned brick */}
+      <mesh position={[0, 1.2, -0.35]}>
+        <planeGeometry args={[7, 3.6]} />
+        <meshBasicMaterial map={wallTex} transparent opacity={0.97} />
+      </mesh>
+      {/* floor — cloned stone path + paper */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0.6]}>
         <planeGeometry args={[7, 4]} />
-        <meshBasicMaterial color="#e8e2d6" />
+        <meshBasicMaterial map={stoneTex} />
       </mesh>
       {/* Sign above doors: SM 2026 */}
       <group position={[0, 2.05, 0.02]}>

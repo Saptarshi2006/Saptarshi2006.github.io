@@ -76,6 +76,9 @@ export const marquee = ["BUILD", "SHIP", "LEARN", "REPEAT"];
 export const socials = [
   { label: "GitHub", href: "https://github.com/Saptarshi2006" },
   { label: "LinkedIn", href: identity.linkedin },
+  { label: "X (Twitter)", href: "https://x.com/Saptarshi2006" },
+  { label: "Instagram", href: "https://www.instagram.com/saptarshi.mukherjee.2006/" },
+  { label: "YouTube", href: "https://www.youtube.com/@saptarshimukherjee" },
   { label: "Email", href: `mailto:${identity.email}` },
 ];
 

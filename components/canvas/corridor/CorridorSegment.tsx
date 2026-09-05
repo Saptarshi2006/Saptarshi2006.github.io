@@ -3,24 +3,28 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { createWallSketchTexture, createWallPaintedTexture, createFloorTexture, createCeilingTexture, createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
+import { useTexture } from "@react-three/drei";
+import { createSketchTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
 
 export const SEGMENT_LENGTH = 80;
 
-type DoorDef = { id: "gallery" | "studio" | "about" | "contact"; side: "left" | "right"; z: number; label: string; sub: string; accent: string };
+type DoorDef = { id: "gallery" | "studio" | "about" | "contact"; side: "left" | "right"; z: number; label: string; sub: string; accent: string; tex: string; texPainted: string };
 
 const DOORS: DoorDef[] = [
-  { id: "gallery", side: "left", z: -18, label: "GALLERY", sub: "01 — WORK", accent: "#dfaf49" },
-  { id: "studio", side: "right", z: -32, label: "STUDIO", sub: "02 — SKILLS", accent: "#6dd993" },
-  { id: "about", side: "left", z: -48, label: "ABOUT", sub: "03 — STORY", accent: "#6fccfb" },
-  { id: "contact", side: "right", z: -62, label: "CONTACT", sub: "04 — TALK", accent: "#c82924" },
+  { id: "gallery", side: "left", z: -18, label: "GALLERY", sub: "01 — WORK", accent: "#dfaf49", tex: "/textures/corridor/doors/drzwiprojekty.webp", texPainted: "/textures/corridor/doors/drzwiprojekty_painted.webp" },
+  { id: "studio", side: "right", z: -32, label: "STUDIO", sub: "02 — SKILLS", accent: "#6dd993", tex: "/textures/corridor/doors/drzwisocial.webp", texPainted: "/textures/corridor/doors/drzwisocial_painted.webp" },
+  { id: "about", side: "left", z: -48, label: "ABOUT", sub: "03 — STORY", accent: "#6fccfb", tex: "/textures/corridor/doors/drzwiabout.webp", texPainted: "/textures/corridor/doors/drzwiabout_painted.webp" },
+  { id: "contact", side: "right", z: -62, label: "CONTACT", sub: "04 — TALK", accent: "#c82924", tex: "/textures/corridor/doors/drzwikontakt.webp", texPainted: "/textures/corridor/doors/drzwikontakt_painted.webp" },
 ];
 
 function Wall({ z, w, h, isLeft }: { z: number; w: number; h: number; isLeft: boolean }) {
-  const tex = useMemo(() => createWallSketchTexture(), []);
+  const tex = useTexture("/textures/corridor/wall_texture.webp");
+  // perfect itom wall: repeat, srgb, no tint
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }), [tex]);
-  // sawtooth angled walls like itom: rotate slightly
   const rot = isLeft ? 0.08 : -0.08;
   const x = isLeft ? -2.9 : 2.9;
   return (
@@ -31,8 +35,11 @@ function Wall({ z, w, h, isLeft }: { z: number; w: number; h: number; isLeft: bo
 }
 
 function Floor({ z }: { z: number }) {
-  const tex = useMemo(() => (typeof document === "undefined" ? null : createFloorTexture()), []);
-  if (!tex) return null;
+  const tex = useTexture("/textures/corridor/kawalekpodlogi.webp");
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(1, 1);
+  tex.colorSpace = THREE.SRGBColorSpace;
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, z]}>
       <planeGeometry args={[6.2, SEGMENT_LENGTH]} />
@@ -41,12 +48,14 @@ function Floor({ z }: { z: number }) {
   );
 }
 function Ceiling({ z }: { z: number }) {
-  const tex = useMemo(() => (typeof document === "undefined" ? null : createCeilingTexture()), []);
-  if (!tex) return null;
+  const tex = useTexture("/textures/corridor/ceiling_texture.webp");
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 2.8, z]}>
       <planeGeometry args={[6.2, SEGMENT_LENGTH]} />
-      <meshBasicMaterial map={tex} color="#ffffff" transparent opacity={0.9} />
+      <meshBasicMaterial map={tex} transparent opacity={0.95} />
     </mesh>
   );
 }
@@ -57,15 +66,18 @@ function Door({ def, globalZ, onEnter, setCameraOverride }: { def: DoorDef; glob
   const hoverRef = useRef(false);
   const doorMeshRef = useRef<THREE.Mesh>(null);
 
-  const { sketch, painted, mat } = useMemo(() => {
-    if (typeof document === "undefined") return { sketch: null, painted: null, mat: null } as any;
-    const sk = createSketchTexture(`${def.label}\n${def.sub}`, { w: 512, h: 640, accent: def.accent });
-    const pt = createPaintedTexture(`${def.label}\n${def.sub}`, { w: 512, h: 640, accent: def.accent });
-    const m = createPaintRevealMaterial(sk, pt, { progress: 0 });
-    return { sketch: sk, painted: pt, mat: m };
-  }, [def.label, def.sub, def.accent]);
+  // Perfect clone: use real itom door textures (sketch/painted pair) for 1:1 fidelity
+  const textures = useTexture([def.tex, def.texPainted]) as unknown as [THREE.Texture, THREE.Texture];
+  const sketch = textures[0];
+  const painted = textures[1];
+  sketch.colorSpace = THREE.SRGBColorSpace;
+  painted.colorSpace = THREE.SRGBColorSpace;
 
-  // keep ref
+  const mat = useMemo(() => {
+    const m = createPaintRevealMaterial(sketch, painted, { progress: 0 });
+    return m;
+  }, [sketch, painted]);
+
   if (mat && !matRef.current) matRef.current = mat;
 
   useFrame(() => {
@@ -164,18 +176,14 @@ function Door({ def, globalZ, onEnter, setCameraOverride }: { def: DoorDef; glob
   );
 }
 
-function FrameArt({ z, side }: { z: number; side: "left" | "right" }) {
-  const tex = useMemo(() => {
-    if (typeof document === "undefined") return null;
-    const labels = ["✦", "◎", "⬢", "⬣", "✿", "◆"];
-    const l = labels[Math.floor(Math.random() * labels.length)];
-    const sk = createSketchTexture(l, { w: 256, h: 320 });
-    // we just use sketch as basic mat for art
-    return sk;
-  }, []);
+function FrameArt({ z, side, variant = 0 }: { z: number; side: "left" | "right"; variant?: number }) {
+  // Clone itom frame art: use real painted frames (alternating)
+  const which = variant % 2 === 0 ? "/textures/corridor/ramkanazdjecieduza.webp" : "/textures/corridor/ramkanazdjeciemala.webp";
+  const paintedWhich = variant % 2 === 0 ? "/textures/corridor/ramkanazdjecieduza_painted.webp" : "/textures/corridor/ramkanazdjeciemala.webp";
+  const tex = useTexture(variant % 3 === 0 ? paintedWhich : which);
+  tex.colorSpace = THREE.SRGBColorSpace;
   const x = side === "left" ? -2.2 : 2.2;
   const rot = side === "left" ? 0.12 : -0.12;
-  if (!tex) return null;
   return (
     <group position={[x, 0.9, z]} rotation={[0, rot, 0]}>
       <mesh>
@@ -186,7 +194,6 @@ function FrameArt({ z, side }: { z: number; side: "left" | "right" }) {
         <edgesGeometry args={[new THREE.PlaneGeometry(0.62, 0.78)]} />
         <lineBasicMaterial color="#1a1a1a" opacity={0.5} transparent />
       </lineSegments>
-      {/* frame border */}
       <mesh position={[0, 0, -0.01]}>
         <planeGeometry args={[0.68, 0.84]} />
         <meshBasicMaterial color="#1a1a1a" transparent opacity={0.06} />
@@ -277,9 +284,9 @@ export default function CorridorSegment({
           />
         ))}
 
-      {/* frame art between doors */}
+      {/* frame art between doors — perfect itom clone */}
       {decorZs.map((d, i) => (
-        <FrameArt key={i} z={d.z} side={d.side} />
+        <FrameArt key={i} z={d.z} side={d.side} variant={i} />
       ))}
 
       {/* end double doors (visual) at segment boundary to suggest continuity */}

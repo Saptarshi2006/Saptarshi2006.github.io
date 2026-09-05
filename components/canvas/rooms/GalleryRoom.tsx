@@ -87,12 +87,12 @@ export default function GalleryRoom({ scrollOffset = 0 }: { scrollOffset?: numbe
 
   return (
     <group position={[0, 0, -30]}>
-      {/* floor paper */}
+      {/* floor — cloned gallery floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.4, 2]}>
         <planeGeometry args={[22, 12]} />
         <meshBasicMaterial color="#ebe7dc" />
       </mesh>
-      {/* back houses sketch */}
+      {/* back houses — cloned paper */}
       <mesh position={[0, 1.2, -4]}>
         <planeGeometry args={[14, 3.5]} />
         <meshBasicMaterial color="#faf8f3" transparent opacity={0.9} />

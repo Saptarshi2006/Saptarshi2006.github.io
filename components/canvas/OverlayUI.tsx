@@ -19,6 +19,14 @@ export function NavigationUI() {
         <span className="h-px w-6 bg-ink/15" />
         <span>SAPTARSHI 2026</span>
       </div>
+      {/* Always-visible socials — perfect clone wants LinkedIn etc in header */}
+      <div className="hidden lg:flex pointer-events-auto items-center gap-2 ml-3">
+        {socials.slice(0, 4).map((s) => (
+          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="rounded-full border border-ink/10 bg-paper px-3 py-1.5 text-[10px] tracking-[0.2em] text-ink hover:bg-ink hover:text-paper transition">
+            {s.label}
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
@@ -70,17 +78,25 @@ export function GlobalOverlay() {
         </div>
       )}
 
-      {/* footer always */}
-      <div className="fixed bottom-4 right-6 z-30 hidden sm:flex items-center gap-4 text-[10px] tracking-[0.2em] text-ink/40">
+      {/* footer always — all socials including LinkedIn prominent */}
+      <div className="fixed bottom-4 right-6 z-30 hidden sm:flex items-center gap-3 text-[10px] tracking-[0.2em] text-ink/50 backdrop-blur rounded-full border border-ink/10 bg-paper/85 px-4 py-2">
         <span>© {new Date().getFullYear()} {identity.name}</span>
         <span className="h-3 w-px bg-ink/15" />
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           {socials.map((s) => (
-            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="pointer-events-auto hover:text-ink transition">
+            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className={`pointer-events-auto hover:text-ink transition ${s.label === "LinkedIn" ? "text-[#0a66c2] font-bold" : ""}`}>
               {s.label}
             </a>
           ))}
         </div>
+      </div>
+      {/* mobile social bar */}
+      <div className="fixed bottom-4 left-1/2 z-30 flex sm:hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-ink/10 bg-paper px-3 py-2 shadow-sm">
+        {socials.map((s) => (
+          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className={`text-[10px] tracking-[0.15em] ${s.label === "LinkedIn" ? "text-[#0a66c2]" : "text-ink/70"}`}>
+            {s.label === "LinkedIn" ? "in" : s.label.slice(0, 2).toUpperCase()}
+          </a>
+        ))}
       </div>
     </>
   );
