@@ -27,8 +27,7 @@
 :root {
   --ink: #1d1d1d;
   --charcoal: #121212;
-  --paper: #faf8f3;
-  --paper-warm: #faf8f3;
+  --paper: #ffffff;
   --crimson: #c82924;
 }
 
@@ -38,12 +37,12 @@ body {
 }
 
 html {
-  background: var(--paper-warm);
+  background: var(--ink);
 }
 
 body {
-  background: var(--paper-warm);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

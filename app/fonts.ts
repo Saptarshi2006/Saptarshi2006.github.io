@@ -21,26 +21,4 @@ const gtEraLight = localFont({
   display: "swap",
 });
 
-// Hand-drawn sketch fonts — cloned from itom for perfect fidelity
-const cabinSketch = localFont({
-  src: "../public/fonts/CabinSketch-Regular.ttf",
-  variable: "--font-cabin-sketch",
-  weight: "400",
-  display: "swap",
-});
-
-const fredericka = localFont({
-  src: "../public/fonts/FrederickatheGreat-Regular.ttf",
-  variable: "--font-fredericka",
-  weight: "400",
-  display: "swap",
-});
-
-const rubikScribble = localFont({
-  src: "../public/fonts/RubikScribble-Regular.ttf",
-  variable: "--font-rubik-scribble",
-  weight: "400",
-  display: "swap",
-});
-
-export const fontVariables = `${charlesRosie.variable} ${nikkeiUltra.variable} ${gtEraLight.variable} ${cabinSketch.variable} ${fredericka.variable} ${rubikScribble.variable}`;
+export const fontVariables = `${charlesRosie.variable} ${nikkeiUltra.variable} ${gtEraLight.variable}`;
