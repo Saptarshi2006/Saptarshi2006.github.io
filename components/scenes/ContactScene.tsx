@@ -30,14 +30,20 @@ export default function ContactScene() {
         <span className="text-xs text-white/40">OPEN TO INTERNSHIPS, COLLABS & COFFEE</span>
       </a>
 
-      <div className="flex flex-wrap items-center justify-center gap-8">
+      <div className="flex flex-wrap items-center justify-center gap-4">
         {socials.map((s) => (
           <a
             key={s.label}
             href={s.href}
             target={s.href.startsWith("http") ? "_blank" : undefined}
             rel="noopener noreferrer"
-            className="underline-link text-techno text-sm tracking-[0.25em] text-white/70 transition-colors hover:text-paper"
+            className={`rounded-full border px-5 py-2.5 text-techno text-sm tracking-[0.2em] transition ${
+              s.label === "LinkedIn"
+                ? "border-[#0a66c2] bg-[#0a66c2] text-white hover:bg-[#084e96]"
+                : s.label === "GitHub"
+                  ? "border-white/15 bg-white/5 text-white hover:bg-white hover:text-ink"
+                  : "border-white/10 text-white/70 hover:border-white/30 hover:text-paper"
+            }`}
           >
             {s.label}
           </a>

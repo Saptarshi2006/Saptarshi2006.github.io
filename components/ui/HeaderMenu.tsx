@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { useUI } from "@/lib/store";
-import { nav } from "@/lib/content";
+import { nav, identity } from "@/lib/content";
 import { scrollToSection } from "@/lib/smooth";
 
 export default function HeaderMenu() {
@@ -33,7 +33,7 @@ export default function HeaderMenu() {
   return (
     <div
       ref={rootRef}
-      className="fixed right-6 top-5 z-[100] opacity-0 mix-blend-difference"
+      className="fixed left-1/2 top-5 z-[100] flex -translate-x-1/2 items-center gap-3 opacity-0 mix-blend-difference md:left-auto md:right-6 md:translate-x-0"
     >
       <div className="relative flex h-10 items-center overflow-hidden rounded-full border border-white/10 bg-ink/60 backdrop-blur-sm">
         <div ref={bgRef} className="absolute inset-0 rounded-full bg-paper" />
@@ -53,6 +53,14 @@ export default function HeaderMenu() {
           ))}
         </div>
       </div>
+      <a
+        href={identity.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hidden items-center gap-2 rounded-full border border-white/15 bg-[#0a66c2] px-4 py-2 text-techno text-xs tracking-widest text-white shadow-lg transition hover:bg-[#084e96] md:flex"
+      >
+        in LinkedIn
+      </a>
     </div>
   );
 }

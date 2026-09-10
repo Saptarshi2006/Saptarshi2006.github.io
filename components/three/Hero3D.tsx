@@ -118,8 +118,9 @@ export default function Hero3D() {
   return (
     <>
       <GazeCamera intensity={0.5} lookAt={1.4} />
-      <ambientLight intensity={0.35} />
-      <pointLight position={[3, 3, 2]} intensity={30} color="#fff3dd" />
+      <ambientLight intensity={0.38} />
+      <pointLight position={[3, 3, 2]} intensity={32} color="#fff3dd" />
+      <pointLight position={[-2, 2, 1]} intensity={12} color="#6fccfb" />
       <StudioEnv />
       <Backdrop colorA="#1d1d1d" colorB="#26231d" z={-8} />
       <Moon />
@@ -128,14 +129,14 @@ export default function Hero3D() {
       <MSDFText
         position={[0, 0.5, -4.5]}
         color="#d9d4c8"
-        opacity={0.1}
+        opacity={0.13}
         letterSpacing={28}
         width={9}
       >
         ENGINEER
       </MSDFText>
-      <Particles count={700} spread={[18, 9, 3]} size={0.04} opacity={0.3} />
-      <BloomFx intensity={0.45} luminanceThreshold={0.7} />
+      <Particles count={850} spread={[18, 9, 3]} size={0.045} opacity={0.35} />
+      <BloomFx intensity={0.58} luminanceThreshold={0.62} />
     </>
   );
 }

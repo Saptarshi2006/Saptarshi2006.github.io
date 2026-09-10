@@ -161,3 +161,25 @@ html.lenis body {
   background: rgba(255, 255, 255, 0.25);
   border-radius: 3px;
 }
+
+/* ---------- Premium film overlay ---------- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.06;
+  background-image: url("/fx/cell_noise.png");
+  background-size: 280px 280px;
+  mix-blend-mode: soft-light;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.52) 100%);
+  opacity: 0.9;
+}
