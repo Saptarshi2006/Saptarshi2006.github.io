@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
 import { projects } from "@/lib/content";
+import { planeEdges } from "@/lib/threeCache";
 
 function ProjectCard({ project, index, offset }: { project: typeof projects[number]; index: number; offset: number }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -45,8 +46,7 @@ function ProjectCard({ project, index, offset }: { project: typeof projects[numb
         <planeGeometry args={[0.18, 0.16]} />
         <meshBasicMaterial color="#dfaf49" />
       </mesh>
-      <lineSegments position={[0, 0.85, 0.031]}>
-        <edgesGeometry args={[new THREE.PlaneGeometry(0.18, 0.16)]} />
+      <lineSegments position={[0, 0.85, 0.031]} geometry={planeEdges(0.18, 0.16)}>
         <lineBasicMaterial color="#1a1a1a" />
       </lineSegments>
 
@@ -60,8 +60,7 @@ function ProjectCard({ project, index, offset }: { project: typeof projects[numb
       >
         <planeGeometry args={[1.9, 2.45]} />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(1.9, 2.45)]} />
+      <lineSegments geometry={planeEdges(1.9, 2.45)}>
         <lineBasicMaterial color="#1a1a1a" opacity={0.6} transparent />
       </lineSegments>
       {/* stack tags under */}
@@ -97,8 +96,7 @@ export default function GalleryRoom({ scrollOffset = 0 }: { scrollOffset?: numbe
         <planeGeometry args={[14, 3.5]} />
         <meshBasicMaterial color="#faf8f3" transparent opacity={0.9} />
       </mesh>
-      <lineSegments position={[0, 1.2, -3.99]}>
-        <edgesGeometry args={[new THREE.PlaneGeometry(14, 3.5)]} />
+      <lineSegments position={[0, 1.2, -3.99]} geometry={planeEdges(14, 3.5)}>
         <lineBasicMaterial color="#1a1a1a" opacity={0.12} transparent />
       </lineSegments>
       {/* title */}
@@ -128,8 +126,7 @@ export default function GalleryRoom({ scrollOffset = 0 }: { scrollOffset?: numbe
           <planeGeometry args={[2.4, 0.34]} />
           <meshBasicMaterial color="#faf8f3" transparent opacity={0.92} />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(2.4, 0.34)]} />
+        <lineSegments geometry={planeEdges(2.4, 0.34)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
       </group>

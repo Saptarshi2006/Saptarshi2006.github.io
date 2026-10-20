@@ -6,6 +6,7 @@ import * as THREE from "three";
 import gsap from "gsap";
 import { useTexture } from "@react-three/drei";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
+import { planeEdges } from "@/lib/threeCache";
 
 export default function EntranceDoors({
   position = [0, 0, 22] as [number, number, number],
@@ -47,10 +48,21 @@ export default function EntranceDoors({
   }, [rightSketch, rightPainted]);
 
   useFrame(() => {
-    if (!leftMatRef.current || !rightMatRef.current) return;
+    const lm = leftMatRef.current;
+    const rm = rightMatRef.current;
+    if (!lm || !rm) return;
     const target = hovered ? 1 : 0;
-    leftMatRef.current.uniforms.uProgress.value += (target - leftMatRef.current.uniforms.uProgress.value) * 0.08;
-    rightMatRef.current.uniforms.uProgress.value += (target - rightMatRef.current.uniforms.uProgress.value) * 0.08;
+    // epsilon gate: stop writing uniforms once settled
+    const lp = lm.uniforms.uProgress.value;
+    if (Math.abs(target - lp) > 0.001) {
+      const np = lp + (target - lp) * 0.08;
+      lm.uniforms.uProgress.value = Math.abs(target - np) <= 0.001 ? target : np;
+    }
+    const rp = rm.uniforms.uProgress.value;
+    if (Math.abs(target - rp) > 0.001) {
+      const np = rp + (target - rp) * 0.08;
+      rm.uniforms.uProgress.value = Math.abs(target - np) <= 0.001 ? target : np;
+    }
   });
 
   const handleClick = () => {
@@ -96,8 +108,7 @@ export default function EntranceDoors({
           <meshBasicMaterial color="#faf8f3" />
         </mesh>
         {/* sketch sign border */}
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(1.6, 0.5)]} />
+        <lineSegments geometry={planeEdges(1.6, 0.5)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
       </group>
@@ -119,8 +130,7 @@ export default function EntranceDoors({
             <meshBasicMaterial color={hovered ? "#c82924" : "#1a1a1a"} />
           </mesh>
           {/* frame edge */}
-          <lineSegments>
-            <edgesGeometry args={[new THREE.PlaneGeometry(1.28, 2.55)]} />
+          <lineSegments geometry={planeEdges(1.28, 2.55)}>
             <lineBasicMaterial color="#1a1a1a" />
           </lineSegments>
         </group>
@@ -133,8 +143,7 @@ export default function EntranceDoors({
             <circleGeometry args={[0.07, 16]} />
             <meshBasicMaterial color={hovered ? "#dfaf49" : "#1a1a1a"} />
           </mesh>
-          <lineSegments>
-            <edgesGeometry args={[new THREE.PlaneGeometry(1.28, 2.55)]} />
+          <lineSegments geometry={planeEdges(1.28, 2.55)}>
             <lineBasicMaterial color="#1a1a1a" />
           </lineSegments>
         </group>

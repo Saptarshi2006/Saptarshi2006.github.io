@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
 import { identity, socials } from "@/lib/content";
+import { cylinderEdges, planeEdges } from "@/lib/threeCache";
 
 function Barrel({ label, href, accent, pos }: { label: string; href: string; accent: string; pos: [number, number, number] }) {
   const group = useRef<THREE.Group>(null);
@@ -37,8 +38,7 @@ function Barrel({ label, href, accent, pos }: { label: string; href: string; acc
         <cylinderGeometry args={[0.48, 0.52, 0.95, 14]} />
         <meshBasicMaterial color="#e8ddd0" />
       </mesh>
-      <lineSegments position={[0, -0.05, -0.019]}>
-        <edgesGeometry args={[new THREE.CylinderGeometry(0.48, 0.52, 0.95, 14)]} />
+      <lineSegments position={[0, -0.05, -0.019]} geometry={cylinderEdges(0.48, 0.52, 0.95, 14)}>
         <lineBasicMaterial color="#1a1a1a" opacity={0.22} transparent />
       </lineSegments>
       {/* top lid */}
@@ -50,8 +50,7 @@ function Barrel({ label, href, accent, pos }: { label: string; href: string; acc
       <mesh material={mat ?? undefined} position={[0, 0.02, 0.41]} onPointerEnter={() => (hover.current = true)} onPointerLeave={() => (hover.current = false)} onClick={() => window.open(href, "_blank")}>
         <planeGeometry args={[0.78, 0.9]} />
       </mesh>
-      <lineSegments position={[0, 0.02, 0.411]}>
-        <edgesGeometry args={[new THREE.PlaneGeometry(0.78, 0.9)]} />
+      <lineSegments position={[0, 0.02, 0.411]} geometry={planeEdges(0.78, 0.9)}>
         <lineBasicMaterial color="#1a1a1a" />
       </lineSegments>
       {/* hoops */}
@@ -128,8 +127,7 @@ export default function ContactRoom() {
             <cylinderGeometry args={[0.22, 0.32, 1.4, 10]} />
             <meshBasicMaterial color="#faf8f3" />
           </mesh>
-          <lineSegments>
-            <edgesGeometry args={[new THREE.CylinderGeometry(0.22, 0.32, 1.4, 10)]} />
+          <lineSegments geometry={cylinderEdges(0.22, 0.32, 1.4, 10)}>
             <lineBasicMaterial color="#c82924" />
           </lineSegments>
           <mesh position={[0, 0.8, 0]}>
@@ -150,8 +148,7 @@ export default function ContactRoom() {
           <planeGeometry args={[1.9, 1.2]} />
           <meshBasicMaterial color="#faf8f3" />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(1.9, 1.2)]} />
+        <lineSegments geometry={planeEdges(1.9, 1.2)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
         {/* lines on paper */}

@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
+import { circleEdges, planeEdges } from "@/lib/threeCache";
 
 function Balloon({ label, accent, x, y, z, scale = 1 }: { label: string; accent: string; x: number; y: number; z: number; scale?: number }) {
   const group = useRef<THREE.Group>(null);
@@ -40,8 +41,7 @@ function Balloon({ label, accent, x, y, z, scale = 1 }: { label: string; accent:
       <mesh material={mat ?? undefined} onPointerEnter={() => (hover.current = true)} onPointerLeave={() => (hover.current = false)}>
         <circleGeometry args={[0.75, 32]} />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.CircleGeometry(0.75, 32)]} />
+      <lineSegments geometry={circleEdges(0.75, 32)}>
         <lineBasicMaterial color="#1a1a1a" />
       </lineSegments>
       {/* knot */}
@@ -63,13 +63,12 @@ function Cloud({ x, y, z, s }: { x: number; y: number; z: number; s: number }) {
     <group ref={ref} position={[x, y, z]} scale={s}>
       {[0, 0.4, -0.35].map((ox, i) => (
         <mesh key={i} position={[ox, 0, 0]}>
-          <circleGeometry args={[0.5 + Math.random() * 0.2, 16]} />
+          <circleGeometry args={[0.5 + (i % 3) * 0.05, 16]} />
           <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
         </mesh>
       ))}
       {/* sketch outline */}
-      <lineSegments>
-        <edgesGeometry args={[new THREE.CircleGeometry(0.6, 16)]} />
+      <lineSegments geometry={circleEdges(0.6, 16)}>
         <lineBasicMaterial color="#1a1a1a" opacity={0.14} transparent />
       </lineSegments>
     </group>
@@ -88,8 +87,7 @@ function Island({ x, z, label }: { x: number; z: number; label: string }) {
         <planeGeometry args={[2.2, 1.1]} />
         <meshBasicMaterial color="#e8e2d6" />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(2.2, 1.1)]} />
+      <lineSegments geometry={planeEdges(2.2, 1.1)}>
         <lineBasicMaterial color="#1a1a1a" />
       </lineSegments>
       {tex && (
@@ -150,8 +148,7 @@ export default function AboutRoom({ scrollOffset = 0 }: { scrollOffset?: number 
           <planeGeometry args={[0.9, 0.42]} />
           <meshBasicMaterial color="#faf8f3" />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(0.9, 0.42)]} />
+        <lineSegments geometry={planeEdges(0.9, 0.42)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
         {/* nose */}
@@ -201,8 +198,7 @@ export default function AboutRoom({ scrollOffset = 0 }: { scrollOffset?: number 
               <planeGeometry args={[0.9, 0.68]} />
               <meshBasicMaterial color="#faf8f3" />
             </mesh>
-            <lineSegments>
-              <edgesGeometry args={[new THREE.PlaneGeometry(0.9, 0.68)]} />
+            <lineSegments geometry={planeEdges(0.9, 0.68)}>
               <lineBasicMaterial color="#1a1a1a" />
             </lineSegments>
           </group>

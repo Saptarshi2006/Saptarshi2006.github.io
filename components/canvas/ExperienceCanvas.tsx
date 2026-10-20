@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import gsap from "gsap";
@@ -16,9 +16,10 @@ import ContactRoom from "./rooms/ContactRoom";
 
 function SceneBackground() {
   const { scene } = useThree();
-  const paperTex = (() => {
+  // memoized: creating a new Texture (and GPU upload) on every re-render
+  // was wasteful while scrolling inside a room
+  const paperTex = useMemo(() => {
     try {
-      // cloned paper texture for perfect itom fidelity; fallback to color if not loaded
       const t = new THREE.TextureLoader().load("/textures/paper-texture.webp");
       t.wrapS = THREE.RepeatWrapping;
       t.wrapT = THREE.RepeatWrapping;
@@ -28,7 +29,7 @@ function SceneBackground() {
     } catch {
       return null;
     }
-  })();
+  }, []);
   useEffect(() => {
     if (paperTex) {
       scene.background = paperTex;
@@ -189,11 +190,15 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
       {/* Entrance */}
       {!hasEntered && <EntranceDoors position={[0, 0, 22]} onComplete={handleEntranceComplete} />}
 
-      {/* Corridor */}
-      <InfiniteCorridorManager
-        onDoorEnter={handleDoorEnter}
-        hideDoorsForSegments={hasEntered ? [] : [-1]}
-      />
+      {/* Corridor — own Suspense boundary so entrance doors can render
+          as soon as their textures load, without waiting for all
+          corridor wall/floor/door textures. */}
+      <Suspense fallback={null}>
+        <InfiniteCorridorManager
+          onDoorEnter={handleDoorEnter}
+          hideDoorsForSegments={hasEntered ? [] : [-1]}
+        />
+      </Suspense>
 
       {/* Rooms - only when in room or teleporting */}
       {(isInRoom || isTeleporting) && (

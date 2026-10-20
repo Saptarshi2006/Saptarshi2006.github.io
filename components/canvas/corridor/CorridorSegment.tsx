@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useTexture } from "@react-three/drei";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
+import { planeEdges } from "@/lib/threeCache";
 
 export const SEGMENT_LENGTH = 80;
 
@@ -54,7 +55,7 @@ function Ceiling({ z }: { z: number }) {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 2.8, z]}>
       <planeGeometry args={[6.2, SEGMENT_LENGTH]} />
-      <meshBasicMaterial map={tex} transparent opacity={0.95} />
+      <meshBasicMaterial map={tex} />
     </mesh>
   );
 }
@@ -80,13 +81,22 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
   if (mat && !matRef.current) matRef.current = mat;
 
   useFrame(() => {
-    if (!matRef.current) return;
+    const m = matRef.current;
+    const g = groupRef.current;
     const target = hoverRef.current ? 1 : 0;
-    matRef.current.uniforms.uProgress.value += (target - matRef.current.uniforms.uProgress.value) * 0.09;
-    // subtle tilt on hover
-    if (groupRef.current) {
+    // epsilon gates: do zero work (and don't mark matrices dirty) once settled
+    if (m) {
+      const p = m.uniforms.uProgress.value;
+      if (Math.abs(target - p) > 0.001) {
+        const np = p + (target - p) * 0.09;
+        m.uniforms.uProgress.value = Math.abs(target - np) <= 0.001 ? target : np;
+      }
+    }
+    if (g) {
       const tilt = hoverRef.current ? (def.side === "left" ? -0.06 : 0.06) : 0;
-      groupRef.current.rotation.y += (tilt - groupRef.current.rotation.y) * 0.08;
+      if (Math.abs(tilt - g.rotation.y) > 0.0005) {
+        g.rotation.y += (tilt - g.rotation.y) * 0.08;
+      }
     }
   });
 
@@ -120,8 +130,7 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
         <planeGeometry args={[1.45, 2.4]} />
         <meshBasicMaterial color="#1a1a1a" transparent opacity={0.08} side={THREE.DoubleSide} />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(1.45, 2.4)]} />
+      <lineSegments geometry={planeEdges(1.45, 2.4)}>
         <lineBasicMaterial color="#1a1a1a" />
       </lineSegments>
 
@@ -153,8 +162,7 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
           <planeGeometry args={[0.55, 0.18]} />
           <meshBasicMaterial color="#faf8f3" transparent opacity={0.95} />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(0.55, 0.18)]} />
+        <lineSegments geometry={planeEdges(0.55, 0.18)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
       </group>
@@ -165,8 +173,7 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
           <planeGeometry args={[0.9, 0.22]} />
           <meshBasicMaterial color="#faf8f3" />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(0.9, 0.22)]} />
+        <lineSegments geometry={planeEdges(0.9, 0.22)}>
           <lineBasicMaterial color="#1a1a1a" opacity={0.6} transparent />
         </lineSegments>
       </group>
@@ -188,8 +195,7 @@ function FrameArt({ z, side, variant = 0 }: { z: number; side: "left" | "right";
         <planeGeometry args={[0.62, 0.78]} />
         <meshBasicMaterial map={tex} />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(0.62, 0.78)]} />
+      <lineSegments geometry={planeEdges(0.62, 0.78)}>
         <lineBasicMaterial color="#1a1a1a" opacity={0.5} transparent />
       </lineSegments>
       <mesh position={[0, 0, -0.01]}>
@@ -209,8 +215,7 @@ function CorridorLights({ z }: { z: number }) {
           <planeGeometry args={[0.42, 0.42]} />
           <meshBasicMaterial color="#1a1a1a" transparent opacity={0.09} />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(0.42, 0.42)]} />
+        <lineSegments geometry={planeEdges(0.42, 0.42)}>
           <lineBasicMaterial color="#1a1a1a" />
         </lineSegments>
         {/* bulb */}
@@ -288,8 +293,7 @@ export default function CorridorSegment({
           <planeGeometry args={[2.2, 2.55]} />
           <meshBasicMaterial color="#faf8f3" transparent opacity={0.08} side={THREE.DoubleSide} />
         </mesh>
-        <lineSegments>
-          <edgesGeometry args={[new THREE.PlaneGeometry(2.2, 2.55)]} />
+        <lineSegments geometry={planeEdges(2.2, 2.55)}>
           <lineBasicMaterial color="#1a1a1a" opacity={0.12} transparent />
         </lineSegments>
         <mesh position={[-0.55, 0, 0.02]}>
