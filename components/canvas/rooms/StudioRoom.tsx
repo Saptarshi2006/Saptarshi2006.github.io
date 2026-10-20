@@ -5,7 +5,6 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { createSketchTexture, createPaintedTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
-import { skills } from "@/lib/content";
 
 function Monitor({ label, accent, index, offset }: { label: string; accent: string; index: number; offset: number }) {
   const group = useRef<THREE.Group>(null);

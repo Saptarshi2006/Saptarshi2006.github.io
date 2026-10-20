@@ -30,7 +30,7 @@ export default function FitMentorScene() {
   const [active, setActive] = useState(0);
 
   return (
-    <CaseStudy project={project} id="fitmentor" reversed>
+    <CaseStudy project={project} id="fitmentor" >
       <>
         <CanvasStage className="h-full w-full" dpr={[1, 1.5]}>
           <ambientLight intensity={0.5} />

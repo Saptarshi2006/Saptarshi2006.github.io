@@ -145,7 +145,6 @@ export function applyPaintRevealOnBeforeCompile(
       #endif
       `
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (material as any).__paintShader = shader;
   };
   return material;

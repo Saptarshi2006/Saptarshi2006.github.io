@@ -72,13 +72,11 @@ export default function useInfiniteCamera({
 
   function calculateGlance(z: number, segIdx: number): number {
     let total = 0;
-    const zOffset = segIdx * segmentLength;
     // door positions are relative to segment start (10)
     const START_DIST = 12;
     const PEAK_DIST = 4;
     const END_DIST = -6;
     for (const door of DOOR_POSITIONS) {
-      const doorGlobalZ = 10 - zOffset + door.z + (door.z < 0 ? 0 : 0);
       // Actually doors are at z = 10 - seg*80 + offset ; simpler: door.z is offset inside segment (negative forward)
       // So global door Z = 10 - seg*80 + door.z
       // For current segment only, but for glance we want any door in range

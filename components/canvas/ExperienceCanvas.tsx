@@ -19,7 +19,6 @@ function SceneBackground() {
   const paperTex = (() => {
     try {
       // cloned paper texture for perfect itom fidelity; fallback to color if not loaded
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const t = new THREE.TextureLoader().load("/textures/paper-texture.webp");
       t.wrapS = THREE.RepeatWrapping;
       t.wrapT = THREE.RepeatWrapping;
@@ -61,7 +60,6 @@ function RoomRenderer({
 
 function InsideExperience({ onReady }: { onReady: () => void }) {
   const { hasEntered, markEntered, currentRoom, isInRoom, isTeleporting, enterRoom, exitRoom } = useScene();
-  const { settings } = usePerformance();
   const { camera } = useThree();
   const [roomScroll, setRoomScroll] = useState(0);
   const readyFired = useRef(false);
@@ -195,7 +193,6 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
       <InfiniteCorridorManager
         onDoorEnter={handleDoorEnter}
         hideDoorsForSegments={hasEntered ? [] : [-1]}
-        setCameraOverride={setCameraOverride}
       />
 
       {/* Rooms - only when in room or teleporting */}
@@ -217,7 +214,7 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
 }
 
 export default function ExperienceCanvas({ onSceneReady }: { onSceneReady?: () => void }) {
-  const { tier, settings } = usePerformance();
+  const { settings } = usePerformance();
   const [ready, setReady] = useState(false);
   const { hasEntered, isInRoom } = useScene();
 

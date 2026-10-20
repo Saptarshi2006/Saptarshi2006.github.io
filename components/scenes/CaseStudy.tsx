@@ -9,12 +9,10 @@ export default function CaseStudy({
   project,
   id,
   children,
-  reversed = false,
 }: {
   project: Project;
   id: string;
   children: React.ReactNode;
-  reversed?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const setCursorVariant = useUI((s) => s.setCursorVariant);

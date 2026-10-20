@@ -25,11 +25,9 @@ function SegmentVisibilityWrapper({ children, segmentIndex }: { children: React.
 export default function InfiniteCorridorManager({
   onDoorEnter,
   hideDoorsForSegments = [],
-  setCameraOverride,
 }: {
   onDoorEnter: (id: string) => void;
   hideDoorsForSegments?: number[];
-  setCameraOverride?: (v: boolean) => void;
 }) {
   const { camera } = useThree();
   const [activeSegments, setActiveSegments] = useState([0, 1]);
@@ -52,7 +50,6 @@ export default function InfiniteCorridorManager({
             segmentIndex={idx}
             onDoorEnter={onDoorEnter as any}
             hideSegmentDoors={hideDoorsForSegments.includes(idx)}
-            setCameraOverride={setCameraOverride}
           />
         </SegmentVisibilityWrapper>
       ))}

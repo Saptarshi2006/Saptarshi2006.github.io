@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useScene } from "@/context/SceneContext";
-import { identity, socials, projects } from "@/lib/content";
+import { identity, socials } from "@/lib/content";
 
 export function NavigationUI() {
   const { hasEntered, currentRoom } = useScene();
@@ -102,7 +102,7 @@ export function GlobalOverlay() {
   );
 }
 
-export function RoomOverlay({ scrollOffset }: { scrollOffset?: number }) {
+export function RoomOverlay() {
   const { isInRoom, currentRoom } = useScene();
   if (!isInRoom) return null;
 

@@ -4,7 +4,6 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useTexture } from "@react-three/drei";
-import { createSketchTexture } from "@/lib/sketchTexture";
 import { createPaintRevealMaterial } from "@/shaders/paintReveal";
 
 export const SEGMENT_LENGTH = 80;
@@ -60,7 +59,7 @@ function Ceiling({ z }: { z: number }) {
   );
 }
 
-function Door({ def, globalZ, onEnter, setCameraOverride }: { def: DoorDef; globalZ: number; onEnter: (id: DoorDef["id"]) => void; setCameraOverride?: (v: boolean) => void }) {
+function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnter: (id: DoorDef["id"]) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const matRef = useRef<THREE.ShaderMaterial | null>(null);
   const hoverRef = useRef(false);
@@ -99,7 +98,6 @@ function Door({ def, globalZ, onEnter, setCameraOverride }: { def: DoorDef; glob
     // door open anim then enter
     if (doorMeshRef.current) {
       // simple handle swing, then call onEnter
-      const tl = { progress: 0 };
       // GSAP-like manual?
       // Use import gsap dynamically to avoid SSR issues
       import("gsap").then(({ gsap }) => {
@@ -234,14 +232,10 @@ export default function CorridorSegment({
   segmentIndex,
   onDoorEnter,
   hideSegmentDoors,
-  zClip,
-  setCameraOverride,
 }: {
   segmentIndex: number;
   onDoorEnter: (id: DoorDef["id"]) => void;
   hideSegmentDoors?: boolean;
-  zClip?: number;
-  setCameraOverride?: (v: boolean) => void;
 }) {
   const startZ = 10 - segmentIndex * SEGMENT_LENGTH;
   // center of segment for floor
@@ -280,7 +274,6 @@ export default function CorridorSegment({
             def={d}
             globalZ={startZ + d.z}
             onEnter={onDoorEnter}
-            setCameraOverride={setCameraOverride}
           />
         ))}
 

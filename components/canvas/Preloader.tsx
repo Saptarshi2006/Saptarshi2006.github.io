@@ -17,12 +17,18 @@ export default function Preloader({ onComplete, ready }: { onComplete: () => voi
 
   // tear points for paper split
   const tearPoints = useMemo(() => {
+    // Deterministic (seeded) so SSR and client markup match (no hydration mismatch).
+    let seed = 1337;
+    const rnd = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
     const pts: [number, number][] = [];
     const segs = 14;
     pts.push([50, 0]);
     for (let i = 1; i < segs; i++) {
       const y = (i / segs) * 100;
-      const off = (Math.random() - 0.5) * 7;
+      const off = (rnd() - 0.5) * 7;
       pts.push([50 + off, y]);
     }
     pts.push([50, 100]);
