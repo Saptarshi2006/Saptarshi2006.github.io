@@ -106,13 +106,14 @@ export default function useInfiniteCamera({
     const observer = Observer.create({
       target: window,
       type: "wheel,touch,pointer",
-      wheelSpeed: -1,
+      wheelSpeed: 1,
       onChangeY(self) {
         if (cameraOverride.current || !scrollEnabledRef.current) return;
+        // wheel/touch down (positive deltaY) moves camera forward (z decreases)
         const delta = self.deltaY * scrollSpeed * 0.12;
         targetZ.current -= delta;
         // limit wandering (allow -300 to 30)
-        targetZ.current = THREE.MathUtils.clamp(targetZ.current, -260, 30);
+        targetZ.current = THREE.MathUtils.clamp(targetZ.current, -2000, 30);
         if (Math.abs(self.deltaY) > 1) unlockAchievement("corridor_explore");
       },
     });
@@ -125,7 +126,7 @@ export default function useInfiniteCamera({
       const step = 6;
       if (e.key === "ArrowUp" || e.key === "PageUp") targetZ.current += step;
       if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") targetZ.current -= step;
-      targetZ.current = THREE.MathUtils.clamp(targetZ.current, -260, 30);
+      targetZ.current = THREE.MathUtils.clamp(targetZ.current, -2000, 30);
     };
     window.addEventListener("keydown", onKey);
     return () => {
