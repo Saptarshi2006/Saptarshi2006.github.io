@@ -80,7 +80,7 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
     segmentLength: 80,
     scrollSpeed: 0.025,
     parallaxIntensity: 0.45,
-    smoothing: 0.06,
+    smoothing: 4.2,
     scrollEnabled: hasEntered && !isInRoom && !isTeleporting,
     parallaxEnabled: hasEntered && !isInRoom && !isTeleporting,
   });

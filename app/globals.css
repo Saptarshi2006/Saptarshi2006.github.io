@@ -162,3 +162,47 @@ html.lenis body {
   background: rgba(255, 255, 255, 0.25);
   border-radius: 3px;
 }
+
+/* ---------- Paper grain + vignette (itom-style fidelity overlay) ---------- */
+.grain-vignette {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at center, rgba(26, 22, 15, 0) 52%, rgba(26, 22, 15, 0.13) 100%);
+  background-size: 180px 180px, 100% 100%;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Room title card (fades in, holds, fades out) ---------- */
+@keyframes room-title-card {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  14% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.room-title-card {
+  animation: room-title-card 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ---------- HUD depth tick (blips when the meter changes) ---------- */
+@keyframes depth-blip {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.depth-blip {
+  animation: depth-blip 0.25s ease-out;
+}

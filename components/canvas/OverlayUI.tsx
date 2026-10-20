@@ -1,11 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useScene } from "@/context/SceneContext";
 import { identity, socials } from "@/lib/content";
+import { depthStore } from "@/lib/depthStore";
+
+export function EntranceOverlay() {
+  const { hasEntered } = useScene();
+  if (hasEntered) return null;
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-end pb-[11vh] text-center">
+      <h1 className="heading-display text-5xl md:text-7xl text-ink drop-shadow-[0_1px_0_rgba(250,248,243,0.8)]">
+        {identity.name}
+      </h1>
+      <p className="mt-3 text-techno text-[11px] tracking-[0.45em] text-ink/45">{identity.role}</p>
+      <p className="mt-1.5 text-body-light text-xs tracking-[0.2em] text-ink/35">{identity.location}</p>
+      <div className="mt-9 animate-pulse rounded-full border border-ink/15 bg-paper px-5 py-2.5 text-techno text-[10px] tracking-[0.35em] text-ink shadow-sm">
+        CLICK A DOOR TO ENTER
+      </div>
+    </div>
+  );
+}
 
 export function NavigationUI() {
   const { hasEntered, currentRoom } = useScene();
+  const depth = useSyncExternalStore(depthStore.subscribe, depthStore.get, () => 0);
   if (!hasEntered) return null;
 
   const mapLabel = currentRoom ? currentRoom.toUpperCase() : "CORRIDOR";
@@ -14,6 +34,9 @@ export function NavigationUI() {
     <div className="pointer-events-none fixed left-6 top-6 z-30 flex items-center gap-3">
       <div className="rounded-full border border-ink/10 bg-paper px-4 py-2 text-techno text-[10px] tracking-[0.3em] text-ink">
         SM • {mapLabel}
+      </div>
+      <div key={depth} className="depth-blip whitespace-nowrap rounded-full border border-ink/10 bg-paper px-4 py-2 text-techno text-[10px] tracking-[0.3em] text-ink/60 tabular-nums">
+        DEPTH {String(depth).padStart(3, "0")}m
       </div>
       <div className="hidden sm:flex items-center gap-2 text-[10px] tracking-widest text-ink/40">
         <span className="h-px w-6 bg-ink/15" />
@@ -104,40 +127,61 @@ export function GlobalOverlay() {
 
 export function RoomOverlay() {
   const { isInRoom, currentRoom } = useScene();
-  if (!isInRoom) return null;
+  if (!isInRoom || !currentRoom) return null;
+
+  const titleCard = (
+    <div className="pointer-events-none fixed left-1/2 top-[14%] z-30 -translate-x-1/2">
+      <div key={currentRoom} className="room-title-card text-center">
+        <div className="heading-display text-6xl md:text-8xl text-ink/90">{currentRoom.toUpperCase()}</div>
+        <div className="mt-3 text-techno text-[10px] tracking-[0.5em] text-ink/35">— ENTERED —</div>
+      </div>
+    </div>
+  );
 
   if (currentRoom === "gallery") {
     return (
-      <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center">
-        <div className="rounded-full bg-paper border border-ink/10 px-5 py-2.5 text-techno text-[10px] tracking-[0.25em] text-ink shadow-lg">
-          DRAG / SCROLL CARDS ← → • CLICK TO OPEN LIVE SITE
+      <>
+        {titleCard}
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center">
+          <div className="rounded-full bg-paper border border-ink/10 px-5 py-2.5 text-techno text-[10px] tracking-[0.25em] text-ink shadow-lg">
+            DRAG / SCROLL CARDS ← → • CLICK TO OPEN LIVE SITE
+          </div>
         </div>
-      </div>
+      </>
     );
   }
   if (currentRoom === "studio") {
     return (
-      <div className="pointer-events-none fixed left-6 top-1/2 z-30 -translate-y-1/2 hidden lg:block">
-        <div className="rounded-2xl bg-paper border border-ink/10 p-4 shadow-lg max-w-[220px]">
-          <div className="text-techno text-[10px] tracking-[0.3em] text-ink">STUDIO</div>
-          <p className="mt-2 text-sm leading-relaxed text-ink/70">Floating monitors — each one a tech I ship with. Hover to paint, scroll to browse infinite stack.</p>
+      <>
+        {titleCard}
+        <div className="pointer-events-none fixed left-6 top-1/2 z-30 -translate-y-1/2 hidden lg:block">
+          <div className="rounded-2xl bg-paper border border-ink/10 p-4 shadow-lg max-w-[220px]">
+            <div className="text-techno text-[10px] tracking-[0.3em] text-ink">STUDIO</div>
+            <p className="mt-2 text-sm leading-relaxed text-ink/70">Floating monitors — each one a tech I ship with. Hover to paint, scroll to browse infinite stack.</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
   if (currentRoom === "about") {
     return (
-      <div className="pointer-events-none fixed left-1/2 top-10 z-30 -translate-x-1/2 rounded-full bg-paper border border-ink/10 px-5 py-2.5 shadow-lg">
-        <span className="text-techno text-[10px] tracking-[0.3em] text-ink">FLY WITH SCROLL — YOUR STORY AS A FLIGHT PATH ✈︎</span>
-      </div>
+      <>
+        {titleCard}
+        <div className="pointer-events-none fixed left-1/2 top-10 z-30 -translate-x-1/2 rounded-full bg-paper border border-ink/10 px-5 py-2.5 shadow-lg">
+          <span className="text-techno text-[10px] tracking-[0.3em] text-ink">FLY WITH SCROLL — YOUR STORY AS A FLIGHT PATH ✈︎</span>
+        </div>
+      </>
     );
   }
   if (currentRoom === "contact") {
     return (
-      <div className="pointer-events-none fixed left-1/2 bottom-[88px] z-30 -translate-x-1/2 text-center">
-        <div className="text-techno text-xs tracking-[0.3em] text-ink">{identity.email}</div>
-        <div className="text-[11px] tracking-[0.2em] text-ink/50">CLICK A BARREL TO CONNECT</div>
-      </div>
+      <>
+        {titleCard}
+        <div className="pointer-events-none fixed left-1/2 bottom-[88px] z-30 -translate-x-1/2 text-center">
+          <div className="text-techno text-xs tracking-[0.3em] text-ink">{identity.email}</div>
+          <div className="text-[11px] tracking-[0.2em] text-ink/50">CLICK A BARREL TO CONNECT</div>
+        </div>
+      </>
     );
   }
   return null;

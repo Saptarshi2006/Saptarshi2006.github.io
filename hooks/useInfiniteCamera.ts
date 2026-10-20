@@ -6,6 +6,7 @@ import { Observer } from "gsap/Observer";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAchievements } from "@/context/AchievementsContext";
+import { depthStore } from "@/lib/depthStore";
 
 gsap.registerPlugin(Observer);
 
@@ -20,7 +21,8 @@ export default function useInfiniteCamera({
   segmentLength = 80,
   scrollSpeed = 0.025,
   parallaxIntensity = 0.4,
-  smoothing = 0.06,
+  // exponential damping rate (1/s) — frame-rate independent
+  smoothing = 4.2,
   glanceIntensity = 0.15,
   scrollEnabled = true,
   parallaxEnabled = true,
@@ -36,6 +38,7 @@ export default function useInfiniteCamera({
   const { camera } = useThree();
   const targetZ = useRef(28);
   const currentZ = useRef(28);
+  const velocity = useRef(0); // glide momentum (z units / s)
   const parallax = useRef({ x: 0, y: 0 });
   const targetParallax = useRef({ x: 0, y: 0 });
   const glanceOffset = useRef(0);
@@ -60,6 +63,7 @@ export default function useInfiniteCamera({
       gsap.killTweensOf(camera.rotation);
       targetZ.current = camera.position.z;
       currentZ.current = camera.position.z;
+      velocity.current = 0;
       parallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
       targetParallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
       // init glance correctly
@@ -110,10 +114,10 @@ export default function useInfiniteCamera({
       onChangeY(self) {
         if (cameraOverride.current || !scrollEnabledRef.current) return;
         // wheel/touch down (positive deltaY) moves camera forward (z decreases)
-        const delta = self.deltaY * scrollSpeed * 0.12;
-        targetZ.current -= delta;
-        // limit wandering (allow -300 to 30)
-        targetZ.current = THREE.MathUtils.clamp(targetZ.current, -2000, 30);
+        const impulse = -self.deltaY * scrollSpeed * 0.12;
+        targetZ.current = THREE.MathUtils.clamp(targetZ.current + impulse, -2000, 30);
+        // glide momentum: keeps coasting briefly after the wheel stops
+        velocity.current += impulse * 0.9;
         if (Math.abs(self.deltaY) > 1) unlockAchievement("corridor_explore");
       },
     });
@@ -124,8 +128,14 @@ export default function useInfiniteCamera({
         e.preventDefault();
       }
       const step = 6;
-      if (e.key === "ArrowUp" || e.key === "PageUp") targetZ.current += step;
-      if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") targetZ.current -= step;
+      if (e.key === "ArrowUp" || e.key === "PageUp") {
+        targetZ.current += step;
+        velocity.current += 3;
+      }
+      if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") {
+        targetZ.current -= step;
+        velocity.current -= 3;
+      }
       targetZ.current = THREE.MathUtils.clamp(targetZ.current, -2000, 30);
     };
     window.addEventListener("keydown", onKey);
@@ -172,39 +182,65 @@ export default function useInfiniteCamera({
     return () => window.removeEventListener("deviceorientation", onOrient);
   }, [parallaxIntensity]);
 
-  useFrame(() => {
+  useFrame(({ clock }, rawDelta) => {
     if (cameraOverride.current) return;
     if (!scrollEnabledRef.current && !parallaxEnabledRef.current) return;
 
-    // smooth Z
-    currentZ.current += (targetZ.current - currentZ.current) * smoothing;
+    const dt = Math.min(rawDelta, 0.08); // clamp tab-switch spikes
+    const persp = camera as THREE.PerspectiveCamera;
+
+    // glide momentum — coast briefly after input stops (Lenis-like)
+    if (Math.abs(velocity.current) > 0.004) {
+      targetZ.current = THREE.MathUtils.clamp(targetZ.current + velocity.current * dt, -2000, 30);
+      velocity.current *= Math.exp(-3.4 * dt);
+    } else {
+      velocity.current = 0;
+    }
+
+    // frame-rate independent damping (feels identical at 60 vs 120 Hz)
+    const kZ = 1 - Math.exp(-smoothing * dt);
+    currentZ.current += (targetZ.current - currentZ.current) * kZ;
     const z = currentZ.current;
     camera.position.z = z;
+    depthStore.set(Math.max(0, Math.round(28 - z)));
 
     // segment
     const seg = Math.floor((10 - z) / segmentLength);
     if (seg !== currentSegment.current) currentSegment.current = seg;
 
     // parallax lerp
-    parallax.current.x += (targetParallax.current.x - parallax.current.x) * 0.08;
-    parallax.current.y += (targetParallax.current.y - parallax.current.y) * 0.08;
+    const kP = 1 - Math.exp(-5.2 * dt);
+    parallax.current.x += (targetParallax.current.x - parallax.current.x) * kP;
+    parallax.current.y += (targetParallax.current.y - parallax.current.y) * kP;
+
+    // subtle walking bob, amplitude tied to current speed
+    const speed = Math.abs(targetZ.current - z) + Math.abs(velocity.current);
+    const bobAmp = Math.min(speed * 0.012, 0.03);
+    const bob = Math.sin(clock.elapsedTime * 8.5) * bobAmp;
+
     camera.position.x = parallax.current.x;
-    camera.position.y = 1.6 + parallax.current.y;
+    camera.position.y = 1.6 + parallax.current.y + bob;
 
     // glance
     const ideal = calculateGlance(z, seg);
     targetGlance.current = ideal;
-    glanceOffset.current += (targetGlance.current - glanceOffset.current) * 0.06;
+    const kG = 1 - Math.exp(-4 * dt);
+    glanceOffset.current += (targetGlance.current - glanceOffset.current) * kG;
 
     // apply rotations (slight yaw + pitch)
     const yaw = parallax.current.x * 0.28 + glanceOffset.current * 2.2;
-    const pitch = parallax.current.y * 0.18;
-    // slerp towards target yaw/pitch via gsap-like lerp on euler
-    camera.rotation.y += (yaw - camera.rotation.y) * 0.08;
-    camera.rotation.x += (pitch - camera.rotation.x) * 0.08;
+    const pitch = parallax.current.y * 0.18 + Math.cos(clock.elapsedTime * 8.5) * bobAmp * 0.35;
+    const kR = 1 - Math.exp(-5.5 * dt);
+    camera.rotation.y += (yaw - camera.rotation.y) * kR;
+    camera.rotation.x += (pitch - camera.rotation.x) * kR;
     camera.rotation.z = -parallax.current.x * 0.04;
 
-    // ensure look forward (camera looks down -Z; rotation handles it)
+    // FOV breathe toward doors (58 base)
+    const targetFov = 58 + Math.abs(glanceOffset.current) * 16;
+    if (Math.abs(persp.fov - targetFov) > 0.02) {
+      persp.fov += (targetFov - persp.fov) * (1 - Math.exp(-3 * dt));
+      persp.updateProjectionMatrix();
+    }
   });
 
   return { setCameraOverride, targetZ, currentZ };

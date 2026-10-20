@@ -8,7 +8,7 @@ import { AchievementsProvider } from "@/context/AchievementsContext";
 import CustomCursor from "@/components/ui/CustomCursor";
 import Preloader from "@/components/canvas/Preloader";
 import ExperienceCanvas from "@/components/canvas/ExperienceCanvas";
-import { NavigationUI, GlobalOverlay } from "@/components/canvas/OverlayUI";
+import { NavigationUI, GlobalOverlay, EntranceOverlay } from "@/components/canvas/OverlayUI";
 
 export default function Experience() {
   const [sceneReady, setSceneReady] = useState(false);
@@ -41,6 +41,9 @@ export default function Experience() {
               <Preloader onComplete={handlePreloaderComplete} ready={sceneReady} />
               <CustomCursor />
               <ExperienceCanvas onSceneReady={handleSceneReady} />
+              {/* paper grain + vignette — signature itom texture over the 3D scene */}
+              <div aria-hidden className="grain-vignette pointer-events-none fixed inset-0 z-20" />
+              <EntranceOverlay />
               <NavigationUI />
               <GlobalOverlay />
 
