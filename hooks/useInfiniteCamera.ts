@@ -2,19 +2,16 @@
 
 import { useRef, useEffect, useCallback, useLayoutEffect } from "react";
 import gsap from "gsap";
-import { Observer } from "gsap/Observer";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAchievements } from "@/context/AchievementsContext";
 import { depthStore } from "@/lib/depthStore";
 
-gsap.registerPlugin(Observer);
-
 const DOOR_POSITIONS = [
-  { z: -18, side: "left" as const },
-  { z: -32, side: "right" as const },
-  { z: -48, side: "left" as const },
-  { z: -62, side: "right" as const },
+  { z: -18, side: "left" as const, label: "GALLERY" },
+  { z: -32, side: "right" as const, label: "STUDIO" },
+  { z: -48, side: "left" as const, label: "ABOUT" },
+  { z: -62, side: "right" as const, label: "CONTACT" },
 ];
 
 export default function useInfiniteCamera({
@@ -38,7 +35,6 @@ export default function useInfiniteCamera({
   const { camera } = useThree();
   const targetZ = useRef(28);
   const currentZ = useRef(28);
-  const velocity = useRef(0); // glide momentum (z units / s)
   const parallax = useRef({ x: 0, y: 0 });
   const targetParallax = useRef({ x: 0, y: 0 });
   const glanceOffset = useRef(0);
@@ -63,7 +59,6 @@ export default function useInfiniteCamera({
       gsap.killTweensOf(camera.rotation);
       targetZ.current = camera.position.z;
       currentZ.current = camera.position.z;
-      velocity.current = 0;
       parallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
       targetParallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
       // init glance correctly
@@ -104,23 +99,47 @@ export default function useInfiniteCamera({
     return total;
   }
 
-  // wheel / touch observer
+  // wheel / touch — native listeners with exact deltas.
+  // (GSAP Observer was multiplying deltas by its internal deltaFactor,
+  // causing ~30x overscroll and runaway motion.)
   useEffect(() => {
     if (!scrollEnabled) return;
-    const observer = Observer.create({
-      target: window,
-      type: "wheel,touch,pointer",
-      wheelSpeed: 1,
-      onChangeY(self) {
-        if (cameraOverride.current || !scrollEnabledRef.current) return;
-        // wheel/touch down (positive deltaY) moves camera forward (z decreases)
-        const impulse = -self.deltaY * scrollSpeed * 0.12;
-        targetZ.current = THREE.MathUtils.clamp(targetZ.current + impulse, -2000, 30);
-        // glide momentum: keeps coasting briefly after the wheel stops
-        velocity.current += impulse * 0.9;
-        if (Math.abs(self.deltaY) > 1) unlockAchievement("corridor_explore");
-      },
-    });
+
+    const applyImpulse = (deltaY: number) => {
+      if (cameraOverride.current || !scrollEnabledRef.current) return;
+      if (!Number.isFinite(deltaY) || deltaY === 0) return;
+      // wheel/touch up (negative deltaY) moves forward; clamp per-event
+      // magnitude so a single event can never launch the camera
+      const raw = -deltaY * scrollSpeed * 0.32;
+      const impulse = THREE.MathUtils.clamp(raw, -3, 3);
+      targetZ.current = THREE.MathUtils.clamp(targetZ.current + impulse, -2000, 30);
+      if (Math.abs(deltaY) > 1) unlockAchievement("corridor_explore");
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (cameraOverride.current || !scrollEnabledRef.current) return;
+      e.preventDefault();
+      // normalize line-mode deltas (Firefox) to pixels
+      const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1;
+      applyImpulse(e.deltaY * scale);
+    };
+
+    let lastTouchY: number | null = null;
+    const onTouchStart = (e: TouchEvent) => {
+      lastTouchY = e.touches[0]?.clientY ?? null;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (cameraOverride.current || !scrollEnabledRef.current) return;
+      e.preventDefault();
+      const y = e.touches[0]?.clientY;
+      if (y == null || lastTouchY == null) return;
+      applyImpulse((lastTouchY - y) * 2.2);
+      lastTouchY = y;
+    };
+    const onTouchEnd = () => {
+      lastTouchY = null;
+    };
+
     // keyboard
     const onKey = (e: KeyboardEvent) => {
       if (cameraOverride.current || !scrollEnabledRef.current) return;
@@ -128,19 +147,21 @@ export default function useInfiniteCamera({
         e.preventDefault();
       }
       const step = 6;
-      if (e.key === "ArrowUp" || e.key === "PageUp") {
-        targetZ.current += step;
-        velocity.current += 3;
-      }
-      if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") {
-        targetZ.current -= step;
-        velocity.current -= 3;
-      }
+      if (e.key === "ArrowUp" || e.key === "PageUp") targetZ.current += step;
+      if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") targetZ.current -= step;
       targetZ.current = THREE.MathUtils.clamp(targetZ.current, -2000, 30);
     };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKey);
     return () => {
-      observer.kill();
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("keydown", onKey);
     };
   }, [scrollEnabled, scrollSpeed, unlockAchievement]);
@@ -189,23 +210,31 @@ export default function useInfiniteCamera({
     const dt = Math.min(rawDelta, 0.08); // clamp tab-switch spikes
     const persp = camera as THREE.PerspectiveCamera;
 
-    // glide momentum — coast briefly after input stops (Lenis-like)
-    if (Math.abs(velocity.current) > 0.004) {
-      targetZ.current = THREE.MathUtils.clamp(targetZ.current + velocity.current * dt, -2000, 30);
-      velocity.current *= Math.exp(-3.4 * dt);
-    } else {
-      velocity.current = 0;
-    }
-
-    // frame-rate independent damping (feels identical at 60 vs 120 Hz)
+    // spring toward input target only — no runaway momentum.
+    // damping alone gives inertia, and it stops the moment you stop.
     const kZ = 1 - Math.exp(-smoothing * dt);
     currentZ.current += (targetZ.current - currentZ.current) * kZ;
     const z = currentZ.current;
     camera.position.z = z;
-    depthStore.set(Math.max(0, Math.round(28 - z)));
 
-    // segment
+    // HUD: meters until the next door (meaningful navigation readout).
+    // forward = decreasing z, so a door is AHEAD when doorZ < cameraZ.
     const seg = Math.floor((10 - z) / segmentLength);
+    let bestDist = Infinity;
+    let bestLabel = "CORRIDOR";
+    for (let s = seg; s <= seg + 2; s++) {
+      for (const d of DOOR_POSITIONS) {
+        const dist = z - (10 - s * segmentLength + d.z); // positive = ahead
+        if (dist > 0.5 && dist < bestDist) {
+          bestDist = dist;
+          bestLabel = d.label;
+        }
+      }
+    }
+    if (Number.isFinite(bestDist)) {
+      depthStore.set(bestLabel, Math.max(0, Math.ceil(bestDist)));
+    }
+
     if (seg !== currentSegment.current) currentSegment.current = seg;
 
     // parallax lerp
@@ -214,7 +243,7 @@ export default function useInfiniteCamera({
     parallax.current.y += (targetParallax.current.y - parallax.current.y) * kP;
 
     // subtle walking bob, amplitude tied to current speed
-    const speed = Math.abs(targetZ.current - z) + Math.abs(velocity.current);
+    const speed = Math.abs(targetZ.current - z);
     const bobAmp = Math.min(speed * 0.012, 0.03);
     const bob = Math.sin(clock.elapsedTime * 8.5) * bobAmp;
 

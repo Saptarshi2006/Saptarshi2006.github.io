@@ -125,9 +125,14 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
   }, [isInRoom]);
 
   const handleEntranceComplete = useCallback(() => {
-    markEntered();
-    // slight camera push forward as if walking through
-    gsap.to(camera.position, { z: 8, duration: 1.1, ease: "power3.inOut" });
+    // slight camera push forward as if walking through; only enable
+    // scroll once the tween finishes so useFrame doesn't fight it
+    gsap.to(camera.position, {
+      z: 8,
+      duration: 1.1,
+      ease: "power3.inOut",
+      onComplete: markEntered,
+    });
   }, [markEntered, camera]);
 
   const handleDoorEnter = useCallback(

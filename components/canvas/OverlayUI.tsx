@@ -25,7 +25,11 @@ export function EntranceOverlay() {
 
 export function NavigationUI() {
   const { hasEntered, currentRoom } = useScene();
-  const depth = useSyncExternalStore(depthStore.subscribe, depthStore.get, () => 0);
+  const next = useSyncExternalStore(
+    depthStore.subscribe,
+    depthStore.get,
+    () => ({ next: "GALLERY", dist: 0 }) as { next: string; dist: number }
+  );
   if (!hasEntered) return null;
 
   const mapLabel = currentRoom ? currentRoom.toUpperCase() : "CORRIDOR";
@@ -35,8 +39,11 @@ export function NavigationUI() {
       <div className="rounded-full border border-ink/10 bg-paper px-4 py-2 text-techno text-[10px] tracking-[0.3em] text-ink">
         SM • {mapLabel}
       </div>
-      <div key={depth} className="depth-blip whitespace-nowrap rounded-full border border-ink/10 bg-paper px-4 py-2 text-techno text-[10px] tracking-[0.3em] text-ink/60 tabular-nums">
-        DEPTH {String(depth).padStart(3, "0")}m
+      <div
+        key={`${next.next}-${next.dist}`}
+        className="depth-blip whitespace-nowrap rounded-full border border-ink/10 bg-paper px-4 py-2 text-techno text-[10px] tracking-[0.3em] text-ink/60 tabular-nums"
+      >
+        NEXT · {next.next} {next.dist}m
       </div>
       <div className="hidden sm:flex items-center gap-2 text-[10px] tracking-widest text-ink/40">
         <span className="h-px w-6 bg-ink/15" />

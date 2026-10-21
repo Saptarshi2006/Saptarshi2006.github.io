@@ -1,13 +1,15 @@
-// Tiny external store for corridor depth (meters walked) so the HUD can
+// Tiny external store for the "next door" HUD readout so the UI can
 // subscribe without re-rendering the whole canvas tree.
-let value = 0;
+export type DepthInfo = { next: string; dist: number };
+
+let value: DepthInfo = { next: "GALLERY", dist: 0 };
 const listeners = new Set<() => void>();
 
 export const depthStore = {
   get: () => value,
-  set(next: number) {
-    if (next === value) return;
-    value = next;
+  set(next: string, dist: number) {
+    if (next === value.next && dist === value.dist) return;
+    value = { next, dist };
     listeners.forEach((l) => l());
   },
   subscribe(listener: () => void) {
