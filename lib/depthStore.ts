@@ -2,7 +2,9 @@
 // subscribe without re-rendering the whole canvas tree.
 export type DepthInfo = { next: string; dist: number };
 
-let value: DepthInfo = { next: "GALLERY", dist: 0 };
+// cached — useSyncExternalStore requires stable snapshot identity
+export const INITIAL_DEPTH: DepthInfo = { next: "GALLERY", dist: 0 };
+let value: DepthInfo = INITIAL_DEPTH;
 const listeners = new Set<() => void>();
 
 export const depthStore = {

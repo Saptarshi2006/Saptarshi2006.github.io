@@ -225,11 +225,9 @@ function InsideExperience({ onReady }: { onReady: () => void }) {
 
 export default function ExperienceCanvas({ onSceneReady }: { onSceneReady?: () => void }) {
   const { settings } = usePerformance();
-  const [ready, setReady] = useState(false);
-  const { hasEntered, isInRoom } = useScene();
+  const { isInRoom } = useScene();
 
   const handleReady = useCallback(() => {
-    setReady(true);
     onSceneReady?.();
   }, [onSceneReady]);
 
@@ -237,7 +235,7 @@ export default function ExperienceCanvas({ onSceneReady }: { onSceneReady?: () =
     <div className="fixed inset-0 h-[100svh] w-screen bg-[#faf8f3]">
       <Canvas
         dpr={settings.dpr as any}
-        camera={{ fov: 58, position: [0, 1.6, 28], near: 0.1, far: 100 }}
+        camera={{ fov: 58, position: [0, 0.45, 28], near: 0.1, far: 100 }}
         gl={{
           antialias: settings.antialias,
           alpha: false,
@@ -258,27 +256,15 @@ export default function ExperienceCanvas({ onSceneReady }: { onSceneReady?: () =
       {isInRoom && (
         <button
           onClick={() => {
-            // trigger via DOM event that InsideExperience listens? For simplicity reload exit logic via custom event
             window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
           }}
-          className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-full border border-ink/15 bg-paper px-6 py-3 text-techno text-xs tracking-[0.25em] text-ink shadow-lg transition hover:bg-ink hover:text-paper"
+          className="group fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 text-techno text-[9px] tracking-[0.5em] text-ink/50 transition-colors hover:text-ink"
         >
-          ← BACK TO CORRIDOR [ESC]
+          <span className="h-px w-6 bg-ink/20 transition-all group-hover:w-10 group-hover:bg-ink/50" />
+          BACK TO CORRIDOR
+          <span className="text-ink/25">ESC</span>
+          <span className="h-px w-6 bg-ink/20 transition-all group-hover:w-10 group-hover:bg-ink/50" />
         </button>
-      )}
-
-      {/* Minimal HUD when not entered */}
-      {!hasEntered && ready && (
-        <div className="pointer-events-none fixed bottom-8 left-1/2 z-30 -translate-x-1/2 text-center">
-          <span className="text-techno text-[10px] tracking-[0.3em] text-ink/50">CLICK DOORS TO ENTER • SCROLL TO WALK • HOVER TO PAINT</span>
-        </div>
-      )}
-
-      {/* Corridor HUD when entered */}
-      {hasEntered && !isInRoom && (
-        <div className="pointer-events-none fixed bottom-6 left-6 z-30 hidden sm:block">
-          <div className="rounded-full border border-ink/10 bg-paper/90 px-4 py-2 text-[10px] tracking-[0.28em] text-ink/60 backdrop-blur">WALK ↓ SCROLL • LOOK ↔ MOVE MOUSE • TILT PHONE</div>
-        </div>
       )}
     </div>
   );

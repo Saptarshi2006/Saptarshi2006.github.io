@@ -8,7 +8,7 @@ import { AchievementsProvider } from "@/context/AchievementsContext";
 import CustomCursor from "@/components/ui/CustomCursor";
 import Preloader from "@/components/canvas/Preloader";
 import ExperienceCanvas from "@/components/canvas/ExperienceCanvas";
-import { NavigationUI, GlobalOverlay, EntranceOverlay } from "@/components/canvas/OverlayUI";
+import { NavigationUI, GlobalOverlay, EntranceOverlay, RoomOverlay } from "@/components/canvas/OverlayUI";
 
 export default function Experience() {
   const [sceneReady, setSceneReady] = useState(false);
@@ -46,6 +46,7 @@ export default function Experience() {
               <EntranceOverlay />
               <NavigationUI />
               <GlobalOverlay />
+              <RoomOverlay />
 
               {/* sr-only helpers */}
               <style>{`.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}`}</style>

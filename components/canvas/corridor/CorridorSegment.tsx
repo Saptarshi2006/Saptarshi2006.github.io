@@ -20,17 +20,31 @@ const DOORS: DoorDef[] = [
 
 function Wall({ z, w, h, isLeft }: { z: number; w: number; h: number; isLeft: boolean }) {
   const tex = useTexture("/textures/corridor/wall_texture.webp");
-  // perfect itom wall: repeat, srgb, no tint
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(8, 1);
   tex.colorSpace = THREE.SRGBColorSpace;
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }), [tex]);
-  const rot = isLeft ? 0.08 : -0.08;
+  // wall runs ALONG the corridor (yaw ±90°), not across it
+  const rot = isLeft ? Math.PI / 2 : -Math.PI / 2;
   const x = isLeft ? -2.9 : 2.9;
   return (
-    <mesh position={[x, h / 2 - 0.2, z]} rotation={[0, rot, 0]} material={mat}>
-      <planeGeometry args={[w, h]} />
-    </mesh>
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      {/* h=4: spans floor (-1.2) to ceiling (2.8) */}
+      <mesh position={[0, h / 2 - 1.2, 0]} material={mat}>
+        <planeGeometry args={[w, h]} />
+      </mesh>
+      {/* skirting board — strong perspective line at floor */}
+      <mesh position={[0, -1.15, 0.02]}>
+        <planeGeometry args={[w, 0.1]} />
+        <meshBasicMaterial color="#1a1a1a" opacity={0.8} transparent />
+      </mesh>
+      {/* cornice at ceiling */}
+      <mesh position={[0, 2.74, 0.02]}>
+        <planeGeometry args={[w, 0.06]} />
+        <meshBasicMaterial color="#1a1a1a" opacity={0.35} transparent />
+      </mesh>
+    </group>
   );
 }
 
@@ -38,7 +52,7 @@ function Floor({ z }: { z: number }) {
   const tex = useTexture("/textures/corridor/kawalekpodlogi.webp");
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(1, 1);
+  tex.repeat.set(2, 10);
   tex.colorSpace = THREE.SRGBColorSpace;
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, z]}>
@@ -51,6 +65,7 @@ function Ceiling({ z }: { z: number }) {
   const tex = useTexture("/textures/corridor/ceiling_texture.webp");
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(3, 10);
   tex.colorSpace = THREE.SRGBColorSpace;
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 2.8, z]}>
@@ -93,15 +108,17 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
       }
     }
     if (g) {
+      const base = def.side === "left" ? Math.PI / 2 - 0.12 : -Math.PI / 2 + 0.12;
       const tilt = hoverRef.current ? (def.side === "left" ? -0.06 : 0.06) : 0;
-      if (Math.abs(tilt - g.rotation.y) > 0.0005) {
-        g.rotation.y += (tilt - g.rotation.y) * 0.08;
+      const target = base + tilt;
+      if (Math.abs(target - g.rotation.y) > 0.0005) {
+        g.rotation.y += (target - g.rotation.y) * 0.08;
       }
     }
   });
 
-  const sideX = def.side === "left" ? -2.55 : 2.55;
-  const sideRot = def.side === "left" ? 0.18 : -0.18; // angled into wall
+  const sideX = def.side === "left" ? -2.82 : 2.82;
+  const sideRot = def.side === "left" ? Math.PI / 2 - 0.12 : -Math.PI / 2 + 0.12; // flush in wall, slight inward angle
 
   const handleClick = () => {
     hoverRef.current = false;
@@ -124,7 +141,7 @@ function Door({ def, globalZ, onEnter }: { def: DoorDef; globalZ: number; onEnte
   };
 
   return (
-    <group ref={groupRef} position={[sideX, 0.45, globalZ]} rotation={[0, sideRot, 0]}>
+    <group ref={groupRef} position={[sideX, 0, globalZ]} rotation={[0, sideRot, 0]}>
       {/* door frame sketch */}
       <mesh position={[0, 0, -0.02]}>
         <planeGeometry args={[1.45, 2.4]} />
@@ -187,10 +204,10 @@ function FrameArt({ z, side, variant = 0 }: { z: number; side: "left" | "right";
   const paintedWhich = variant % 2 === 0 ? "/textures/corridor/ramkanazdjecieduza_painted.webp" : "/textures/corridor/ramkanazdjeciemala.webp";
   const tex = useTexture(variant % 3 === 0 ? paintedWhich : which);
   tex.colorSpace = THREE.SRGBColorSpace;
-  const x = side === "left" ? -2.2 : 2.2;
-  const rot = side === "left" ? 0.12 : -0.12;
+  const x = side === "left" ? -2.8 : 2.8;
+  const rot = side === "left" ? Math.PI / 2 - 0.12 : -Math.PI / 2 + 0.12;
   return (
-    <group position={[x, 0.9, z]} rotation={[0, rot, 0]}>
+    <group position={[x, 0.7, z]} rotation={[0, rot, 0]} scale={1.25}>
       <mesh>
         <planeGeometry args={[0.62, 0.78]} />
         <meshBasicMaterial map={tex} />
@@ -263,8 +280,8 @@ export default function CorridorSegment({
       <Ceiling z={centerZ} />
 
       {/* walls - repeated planks */}
-      <Wall z={centerZ} w={SEGMENT_LENGTH} h={3.2} isLeft />
-      <Wall z={centerZ} w={SEGMENT_LENGTH} h={3.2} isLeft={false} />
+      <Wall z={centerZ} w={SEGMENT_LENGTH} h={4} isLeft />
+      <Wall z={centerZ} w={SEGMENT_LENGTH} h={4} isLeft={false} />
 
       {/* lights every 18 units */}
       {[0, 1, 2, 3].map((i) => (
@@ -288,7 +305,7 @@ export default function CorridorSegment({
       ))}
 
       {/* end double doors (visual) at segment boundary to suggest continuity */}
-      <group position={[0, 0.3, startZ - SEGMENT_LENGTH + 0.5]}>
+      <group position={[0, 0.05, startZ - SEGMENT_LENGTH + 0.5]}>
         <mesh>
           <planeGeometry args={[2.2, 2.55]} />
           <meshBasicMaterial color="#faf8f3" transparent opacity={0.08} side={THREE.DoubleSide} />
@@ -307,7 +324,7 @@ export default function CorridorSegment({
       </group>
 
       {/* subtle fog plane at far end to fake infinite depth */}
-      <mesh position={[0, 0.8, startZ - SEGMENT_LENGTH]}>
+      <mesh position={[0, 0.6, startZ - SEGMENT_LENGTH]}>
         <planeGeometry args={[6, 3]} />
         <meshBasicMaterial color="#faf8f3" transparent opacity={0.22} depthWrite={false} />
       </mesh>

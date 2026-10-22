@@ -57,10 +57,11 @@ export default function useInfiniteCamera({
     if (scrollEnabled && !was) {
       gsap.killTweensOf(camera.position);
       gsap.killTweensOf(camera.rotation);
+      const EYE_Y = 0.45;
       targetZ.current = camera.position.z;
       currentZ.current = camera.position.z;
-      parallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
-      targetParallax.current = { x: camera.position.x, y: camera.position.y - 0.2 };
+      parallax.current = { x: camera.position.x, y: camera.position.y - EYE_Y };
+      targetParallax.current = { x: camera.position.x, y: camera.position.y - EYE_Y };
       // init glance correctly
       const g = calculateGlance(currentZ.current, Math.floor((10 - currentZ.current) / segmentLength));
       glanceOffset.current = g;
@@ -248,7 +249,7 @@ export default function useInfiniteCamera({
     const bob = Math.sin(clock.elapsedTime * 8.5) * bobAmp;
 
     camera.position.x = parallax.current.x;
-    camera.position.y = 1.6 + parallax.current.y + bob;
+    camera.position.y = 0.45 + parallax.current.y + bob; // eye = floor(-1.2) + 1.65
 
     // glance
     const ideal = calculateGlance(z, seg);

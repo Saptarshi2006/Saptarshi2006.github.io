@@ -206,3 +206,17 @@ html.lenis body {
 .depth-blip {
   animation: depth-blip 0.25s ease-out;
 }
+
+/* ---------- HUD pulse (slow opacity breath, no scale) ---------- */
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+.hud-pulse {
+  animation: hud-pulse 2.8s ease-in-out infinite;
+}
